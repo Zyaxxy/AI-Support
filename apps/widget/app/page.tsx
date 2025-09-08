@@ -8,7 +8,7 @@ export default function Page() {
   return (
     <div className="flex items-center justify-center min-h-svh">
       <div className="flex flex-col items-center justify-center">
-        apps/web
+        apps/wigdet
         <div className="max-w-sm w-full mx-auto gap-y-4">
           {JSON.stringify(users, null, 2)}
         </div>
