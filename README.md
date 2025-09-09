@@ -2,7 +2,7 @@
 
 An advanced customer support solution built with cutting-edge AI, voice, and automation features to streamline conversations and enhance user experience.
 
-## ✨ Key Features
+## Key Features
 
 * 🤖 **Real-time AI Chat** using Convex Agents
 * 📣 **Human Handoff & Auto-Close** powered by AI Tools
@@ -22,17 +22,6 @@ An advanced customer support solution built with cutting-edge AI, voice, and aut
 * 🧩 UI Components from **shadcn/ui**
 * 📦 Monorepo managed with **Turborepo**
 * 🪵 **Error Tracking** with Sentry
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-* Node.js 20+
-* pnpm (recommended)
-* AWS Account (for Secrets Manager)
-* Clerk Account (for Auth & Billing)
-* OpenAI/Anthropic/Grok API Keys
-
 
 ## 🛠️ Tech Stack
 
