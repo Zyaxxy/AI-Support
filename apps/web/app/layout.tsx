@@ -1,5 +1,5 @@
 import { ClerkProvider } from '@clerk/nextjs'
-
+import { AuthGuard } from '@/modules/auth/ui/components/auth-guard'
 import { Geist, Geist_Mono } from "next/font/google"
 
 import "@workspace/ui/globals.css"
@@ -25,7 +25,9 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       ><ClerkProvider>
-        <Providers>{children}</Providers>
+        <Providers>
+            {children}
+        </Providers>
       </ClerkProvider>
       </body>
     </html>
