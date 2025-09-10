@@ -1,31 +1,54 @@
-# shadcn/ui monorepo template
+# AI-Powered Customer Support Platform
 
-This template is for creating a monorepo with shadcn/ui.
+An advanced customer support solution built with cutting-edge AI, voice, and automation features to streamline conversations and enhance user experience.
 
-## Usage
+## Key Features
 
-```bash
-pnpm dlx shadcn@latest init
-```
+* 🤖 **Real-time AI Chat** using Convex Agents
+* 📣 **Human Handoff & Auto-Close** powered by AI Tools
+* 🧠 **Smart Knowledge Base** with Embeddings + RAG
+* 🔊 **Voice Support** via [VAPI](https://vapi.ai)
+* 🔑 **Secure API Key Storage** using AWS Secrets Manager
+* 👥 **Team Management** powered by Clerk
+* 🔐 **Authentication** handled by Clerk
+* 💳 **Subscription Billing** integrated with Clerk
+* 🛠️ **Embeddable Widget** for easy integration
+* 📈 **Operator Dashboard** for managing conversations
+* 🧰 **Developer Toolkit** for embed script customization
+* 🧠 **Multi-Model AI Support**: OpenAI, Anthropic, Grok
+* 🌐 Built with **Next.js 15**
+* ⚛️ Powered by **React 19**
+* 🎨 Styled with **Tailwind v4**
+* 🧩 UI Components from **shadcn/ui**
+* 📦 Monorepo managed with **Turborepo**
+* 🪵 **Error Tracking** with Sentry
 
-## Adding components
+## 🛠️ Tech Stack
 
-To add components to your app, run the following command at the root of your `web` app:
+* **Frontend**: Next.js 15, React 19, Tailwind v4, shadcn/ui
+* **Backend**: Convex, AWS Secrets Manager
+* **Auth & Billing**: Clerk
+* **Error Tracking**: Sentry
+* **Monorepo**: Turborepo
 
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
+## 📊 Dashboard
 
-This will place the ui components in the `packages/ui/src/components` directory.
+Operators can:
 
-## Tailwind
+* Manage AI + human conversations
+* Track subscriptions & usage
+* Configure team and API integrations
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+## 📦 Embeddable Widget
 
-## Using components
+Easily integrate support into your app or website with a lightweight embed script and full developer toolkit.
 
-To use the components in your app, import them from the `ui` package.
+## 🤝 Contributing
 
-```tsx
-import { Button } from "@workspace/ui/components/button"
-```
+We welcome contributions! Please fork this repo, create a feature branch, and submit a PR.
+
+## 📜 License
+
+MIT License © 2025 \[ZYAXXY]
+
+
