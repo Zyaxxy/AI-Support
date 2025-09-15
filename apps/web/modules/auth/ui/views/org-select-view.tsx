@@ -1,7 +1,12 @@
-import { OrganizationSelect } from "@clerk/nextjs"
+import { OrganizationList } from "@clerk/nextjs"
 
 export const OrgSelectView = () => {
     return (
-            <OrganizationSelect />
-    );
+            <OrganizationList 
+            afterCreateOrganizationUrl={"/"}
+            afterSelectOrganizationUrl={"/"}
+            hidePersonal
+            skipInvitationScreen    
+            />
+    );  
 };

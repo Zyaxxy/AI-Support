@@ -2,6 +2,7 @@
 
 import { useOrganization } from "@clerk/nextjs";
 import { AuthLayout } from "../layouts/auth-layout";
+import { OrgSelectView } from "../views/org-select-view";
 
 export const OrganizationGuard = ({ children }: { children: React.ReactNode }) => {
     const { organization } = useOrganization();
@@ -10,8 +11,7 @@ export const OrganizationGuard = ({ children }: { children: React.ReactNode }) =
         return (
             <div>
                 <AuthLayout>
-                <h1>Create an organization</h1>
-                <p>You must be part of an organization to access this page.</p>
+                    <OrgSelectView />
                 </AuthLayout>
             </div>
         );
