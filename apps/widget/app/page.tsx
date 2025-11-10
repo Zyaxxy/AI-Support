@@ -1,19 +1,23 @@
 "use client";
-
-import { useQuery } from "convex/react";
-import { api } from "@workspace/backend/_generated/api";
-
+import { useVapi } from "@/module/widget/hooks/use-vapi";
+import { Button } from "@workspace/ui/components/button";
 export default function Page() {
-  const users  = useQuery(api.users.getMany);
+  const { startCall, 
+          isConnected,
+          isConnecting,
+          isSpeaking,
+          transcript,
+          endCall } = useVapi();
+
   return (
     <div className="flex items-center justify-center min-h-svh">
-      <div className="flex flex-col items-center justify-center">
-        apps/wigdet
-        <div className="max-w-sm w-full mx-auto gap-y-4">
-          {JSON.stringify(users, null, 2)}
-        </div>
-        
-      </div>
+      <Button onClick={()=>startCall()}>Start Call</Button>
+      <Button onClick={()=>endCall()}>End Call</Button>
+
+      <p>Is Connected: {isConnected ? "true" : "false"}</p>
+      <p>Is Connecting: {isConnecting ? "true" : "false"}</p>
+      <p>Is Speaking: {isSpeaking ? "true" : "false"}</p>
+      <p>Transcript: {transcript.map((message) => message.content).join("\n")}</p>
     </div>
   )
 }
