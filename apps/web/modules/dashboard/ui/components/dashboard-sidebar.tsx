@@ -34,8 +34,7 @@ import {
 
 } from "@workspace/ui/components/sidebar";
 
-import { cn } from "@workspace/ui/lib/utils";
-import { title } from "process";
+;
 
 
 const CustomerSupportItems = [
@@ -47,7 +46,7 @@ const CustomerSupportItems = [
     },
     {
         title: "Knowledge Base",
-        url: "/knowledge-base",
+        url: "/files",
         icon: LibraryBigIcon,
     },
 ];
