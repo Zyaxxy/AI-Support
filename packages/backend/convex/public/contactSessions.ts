@@ -6,7 +6,7 @@ export const create = mutation({
         name: v.string(),
         email: v.string(),
         organizationId: v.string(),
-        expiresAt: v.number(),
+   
         metadata: v.optional(v.object({
             userAgent: v.optional(v.string()),
             language: v.optional(v.string()),
@@ -15,8 +15,7 @@ export const create = mutation({
             timezoneOffset: v.optional(v.number()),
             cookieEnabled: v.optional(v.boolean()),
             viewportSize: v.optional(v.string()),
-            refferer: v.optional(v.string()),
-        })),
+            referrer: v.optional(v.string()),        })),
     },  
     handler: async (ctx, args ) => {
        const now = Date.now();

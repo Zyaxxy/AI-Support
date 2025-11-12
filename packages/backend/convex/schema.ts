@@ -1,4 +1,3 @@
-import { time } from "console";
 import { defineSchema ,  defineTable } from "convex/server";
 import { v } from "convex/values";
 
@@ -16,8 +15,7 @@ export default defineSchema({
             timezoneOffset: v.optional(v.number()),
             cookieEnabled: v.optional(v.boolean()),
             viewportSize: v.optional(v.string()),
-            refferer: v.optional(v.string()),
-        })),
+            referrer: v.optional(v.string()),        })),
     })
     .index("by_organizationId",["organizationId"])
     .index("by_expiresAt",["expiresAt"]),

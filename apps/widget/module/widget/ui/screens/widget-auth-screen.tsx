@@ -44,15 +44,13 @@ export const WidgetAuthScreen = () => {
             timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
             cookieEnabled: navigator.cookieEnabled,
             viewportSize: window.innerWidth + "x" + window.innerHeight,
-            refferer: document.referrer || "",
-        };
-        const contactSessionId = await createContactSession({
+            referrer: document.referrer || "",
+        };        const contactSessionId = await createContactSession({
             ...values,
             organizationId,
-            expiresAt: Date.now(),
+       
             metadata,
-        });
-        console.log({contactSessionId});
+        });        console.log({contactSessionId});
     }   
 
     
