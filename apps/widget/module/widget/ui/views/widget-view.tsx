@@ -3,6 +3,7 @@
 import { useAtomValue } from "jotai";
 import { screenAtom } from "../../atoms/widget-atoms";
 import { WidgetAuthScreen } from "../screens/widget-auth-screen";
+import { WidgetErrorScreen } from "../screens/widget-error-screen";
 
 
 interface Props {
@@ -20,7 +21,7 @@ export const WidgetView = ({ organizationId }: Props) => {
         "inbox": <div>Inbox</div>,
         "chat": <div>Chat</div>,
         "contact": <div>Contact</div>,
-        "error": <div>Error</div>,
+        "error": <WidgetErrorScreen/>,
     };  
     return (
         <main className="min-h-screen min-w-screen flex h-full w-full flex-col overflow-hidden rounded-xl border bg-muted">
