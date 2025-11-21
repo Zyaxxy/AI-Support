@@ -4,7 +4,7 @@ import { WidgetHeader } from "../components/widget-header";
 import { useAtomValue, useSetAtom } from "jotai";
 import { errorMessageAtom , loadingMessageAtom , organizationIdAtom,screenAtom } from "../../atoms/widget-atoms";
 import { useEffect, useState } from "react";
-import { useMutation } from "convex/react";
+import { useAction } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 
 
@@ -20,7 +20,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
   const setLoadingMessage = useSetAtom(loadingMessageAtom);
   const SetErrorMessage = useSetAtom(errorMessageAtom); 
   const setScreen = useSetAtom(screenAtom);
-  const validateOrganization = useMutation(api.public.organizations.validate);
+  const validateOrganization = useAction(api.public.organizations.validate);
 
 
   useEffect(() => { 

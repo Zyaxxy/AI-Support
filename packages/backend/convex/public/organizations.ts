@@ -1,12 +1,12 @@
 import { v } from "convex/values";
-import { mutation } from "../_generated/server";
+import { action } from "../_generated/server";
 import { createClerkClient } from "@clerk/backend";
 
 const clerkClient = createClerkClient({
     secretKey: process.env.CLERK_SECRET_KEY,
 });
 
-export const validate = mutation({
+export const validate = action({
     args: {
         organizationId: v.string(),
     },  
@@ -17,7 +17,7 @@ export const validate = mutation({
             });
             return {valid: true};
        } catch (error) {
-            return {valid: false , reason: "organization not found"};
+            return {valid: false , reason: "organization not Valid"};
        }
     },
 });
