@@ -1,11 +1,9 @@
 "use client";
-import { useAtomValue } from "jotai";
-import { AlertTriangleIcon } from "lucide-react";
-import { errorMessageAtom } from "../../atoms/widget-atoms";
+import { LoaderIcon } from "lucide-react";
 import { WidgetHeader } from "../components/widget-header";
 
-export const WidgetLoadingScreen = () => {
-  const errorMessage = useAtomValue(errorMessageAtom);
+export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string|null }) => {
+  
 
   return (
     <>
@@ -18,9 +16,9 @@ export const WidgetLoadingScreen = () => {
         </div>
         </WidgetHeader>
         <div className="flex flex-1 flex-col items-center justify-center gap-y-4 p-4 text-muted-foreground">
-            <AlertTriangleIcon/>
+            <LoaderIcon className="animate-spin"/>
             <p className="text-sm font-bold">
-                {errorMessage || "Invalid Configuration"}
+                Loading...
             </p>
 
         </div>
