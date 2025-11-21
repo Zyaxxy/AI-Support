@@ -1,9 +1,43 @@
 "use client";
 import { LoaderIcon } from "lucide-react";
 import { WidgetHeader } from "../components/widget-header";
+import { useAtomValue, useSetAtom } from "jotai";
+import { errorMessageAtom , loadingMessageAtom , screenAtom } from "../../atoms/widget-atoms";
+import { useEffect, useState } from "react";
+import { useMutation } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
+import { set } from "zod/v4-mini";
+import { validate } from "@workspace/backend/public/contactSessions";
+
+
+
+type InitStep = "storage" | "org" | "session" | "settings" | "vapi" | "done";
 
 export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string|null }) => {
-  
+  const [step, setStep] = useState<InitStep>("org");
+  const [session, setSession] = useState<string|null>(null);
+  const loadingMessage = useAtomValue(loadingMessageAtom);
+  const setLoadingMessage = useSetAtom(loadingMessageAtom);
+  const SetErrorMessage = useSetAtom(errorMessageAtom); 
+  const setScreen = useSetAtom(screenAtom);
+  const validateOrganization = useMutation(api.public.organizations.validate);
+
+
+  useEffect(() => { 
+    if(step != "org"){
+      return;
+    }
+    setLoadingMessage("Loading organization...");
+
+    if(!organizationId){
+      SetErrorMessage("Organization ID is required");
+      setScreen("error");
+    }
+
+    setLoadingMessage("Validating organization...");
+
+  },[step, organizationId, SetErrorMessage, setScreen]);  
+
 
   return (
     <>
@@ -18,7 +52,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
         <div className="flex flex-1 flex-col items-center justify-center gap-y-4 p-4 text-muted-foreground">
             <LoaderIcon className="animate-spin"/>
             <p className="text-sm font-bold">
-                Loading...
+                {loadingMessage || "Loading..."}
             </p>
 
         </div>
