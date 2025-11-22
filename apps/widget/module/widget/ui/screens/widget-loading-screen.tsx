@@ -85,6 +85,15 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       });
   }, [step, sessionValid, setStep, contactSessionId, validateContactSession, setLoadingMessage]);
 
+  useEffect(() => {
+    if (step != "done") {
+      return;
+    }
+    const hasValidSession = contactSessionId && sessionValid;
+    setScreen(hasValidSession ? "selection" : "auth");
+
+  }, [step, contactSessionId, sessionValid, setScreen]);
+
 
   return (
     <>
