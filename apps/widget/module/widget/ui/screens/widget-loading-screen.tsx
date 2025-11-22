@@ -2,10 +2,11 @@
 import { LoaderIcon } from "lucide-react";
 import { WidgetHeader } from "../components/widget-header";
 import { useAtomValue, useSetAtom } from "jotai";
-import { errorMessageAtom, loadingMessageAtom, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
+import { errorMessageAtom, loadingMessageAtom, organizationIdAtom, screenAtom, contactSessionIdAtomFamily } from "../../atoms/widget-atoms";
 import { useEffect, useState } from "react";
 import { useAction, useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import { Id } from "@workspace/backend/_generated/dataModel";
 
 
 
@@ -14,7 +15,7 @@ type InitStep = "storage" | "org" | "session" | "settings" | "vapi" | "done";
 
 export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string | null }) => {
   const [step, setStep] = useState<InitStep>("org");
-  const [session, setSession] = useState<string | null>(null);
+  const [sessionValid, setSessionValid] = useState<boolean>(false);
   const loadingMessage = useAtomValue(loadingMessageAtom);
   const setOrganizationId = useSetAtom(organizationIdAtom);
   const setLoadingMessage = useSetAtom(loadingMessageAtom);
@@ -41,9 +42,8 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       .then((result) => {
         if (result.valid) {
           setOrganizationId(organizationId);
-          setLoadingMessage("Loading session...");
+          setLoadingMessage("Finding Organization");
           setScreen("loading");
-          setStep("session");
         } else {
           SetErrorMessage(result.reason || "Invalid organization");
           setScreen("error");
@@ -54,11 +54,36 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
         setScreen("error");
       });
   }, [step, organizationId, SetErrorMessage, setScreen, setLoadingMessage, setOrganizationId, setStep]);
+  //validate session if exists
 
+  const contactSessionId = useAtomValue(contactSessionIdAtomFamily(organizationId || ""));
   const validateContactSession = useMutation(api.public.contactSessions.validate);
   useEffect(() => {
+    if (step != "session") {
+      return;
+    }
+    setLoadingMessage("Loading session...");
 
-  }, [step, session, SetErrorMessage, setScreen, setLoadingMessage, setSession, setStep]);
+    if (!contactSessionId) {
+      setSessionValid(false);
+      setStep("done");
+      return;
+    }
+
+    setLoadingMessage("Validating session...");
+
+    validateContactSession({ contactSessionId: contactSessionId as Id<"contactSessions">, })
+      .then((result) => {
+        if (result.valid) {
+          setSessionValid(true);
+          setStep("done");
+        }
+      })
+      .catch(() => {
+        setSessionValid(false);
+        setStep("settings");
+      });
+  }, [step, sessionValid, setStep, contactSessionId, validateContactSession, setLoadingMessage]);
 
 
   return (
