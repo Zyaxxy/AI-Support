@@ -4,11 +4,45 @@ import { useAtomValue } from "jotai";
 import { WidgetHeader } from "../components/widget-header";
 import { Button } from "@workspace/ui/components/button";
 import { ChevronRightIcon, MessageSquareTextIcon } from "lucide-react";
-import { screenAtom } from "../../atoms/widget-atoms";
+import { organizationIdAtom, screenAtom, contactSessionIdAtomFamily } from "../../atoms/widget-atoms";
 import { useSetAtom } from "jotai";
+import { useMutation } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
+import { errorMessageAtom } from "../../atoms/widget-atoms";
 
 export const WidgetSelectionScreen = () => {
   const setScreen = useSetAtom(screenAtom);
+  const setErrorMessage = useSetAtom(errorMessageAtom);
+  const organizationId = useAtomValue(organizationIdAtom);
+  const contactSessionId = useAtomValue(contactSessionIdAtomFamily(organizationId || ""));
+
+  const createConversation = useMutation(api.public.conversations.create);
+
+  const handleNewConversation = async () => {
+    if (!organizationId) {
+      setScreen("error");
+      setErrorMessage("Organization not found");
+    }
+
+
+    if (!contactSessionId) {
+      setScreen("auth");
+      setErrorMessage("Contact session not found");
+      return;
+    }
+    try {
+      const conversationId = await createConversation({
+        organizationId,
+        contactSessionId,
+      });
+      setScreen("chat");
+
+    } catch (error) {
+      setScreen("error");
+      setErrorMessage("Failed to create conversation");
+    }
+
+  };
 
   return (
     <>
