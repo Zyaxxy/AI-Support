@@ -42,8 +42,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       .then((result) => {
         if (result.valid) {
           setOrganizationId(organizationId);
-          setLoadingMessage("Finding Organization");
-          setScreen("loading");
+          setStep("session");
         } else {
           SetErrorMessage(result.reason || "Invalid organization");
           setScreen("error");
@@ -53,7 +52,14 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
         SetErrorMessage(error.message || "Something went wrong");
         setScreen("error");
       });
-  }, [step, organizationId, SetErrorMessage, setScreen, setLoadingMessage, setOrganizationId, setStep]);
+  }, [step,
+    organizationId,
+    SetErrorMessage,
+    setScreen,
+    setLoadingMessage,
+    setOrganizationId,
+    validateOrganization]);
+
   //validate session if exists
 
   const contactSessionId = useAtomValue(contactSessionIdAtomFamily(organizationId || ""));
@@ -81,7 +87,7 @@ export const WidgetLoadingScreen = ({ organizationId }: { organizationId: string
       })
       .catch(() => {
         setSessionValid(false);
-        setStep("settings");
+        setStep("done");
       });
   }, [step, sessionValid, setStep, contactSessionId, validateContactSession, setLoadingMessage]);
 
