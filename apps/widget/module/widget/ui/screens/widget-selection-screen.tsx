@@ -22,6 +22,7 @@ export const WidgetSelectionScreen = () => {
     if (!organizationId) {
       setScreen("error");
       setErrorMessage("Organization not found");
+      return;
     }
 
 
@@ -55,7 +56,7 @@ export const WidgetSelectionScreen = () => {
         </div>
       </WidgetHeader>
       <div className="flex flex-1 flex-col gap-y-4 overflow-y-auto p-4 ">
-        <Button className="h-16 w-full justify-between" variant={"outline"} onClick={() => { }}>
+        <Button className="h-16 w-full justify-between" variant={"outline"} onClick={handleNewConversation}>
           <div className="flex items-center gap-x-2">
             <MessageSquareTextIcon className="size-4" />
             <span>Start Chat</span>
