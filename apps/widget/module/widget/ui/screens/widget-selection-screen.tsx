@@ -4,20 +4,22 @@ import { useAtomValue } from "jotai";
 import { WidgetHeader } from "../components/widget-header";
 import { Button } from "@workspace/ui/components/button";
 import { ChevronRightIcon, MessageSquareTextIcon } from "lucide-react";
-import { organizationIdAtom, screenAtom, contactSessionIdAtomFamily } from "../../atoms/widget-atoms";
+import { conversationIdAtom, organizationIdAtom, screenAtom, contactSessionIdAtomFamily } from "../../atoms/widget-atoms";
 import { useSetAtom } from "jotai";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { errorMessageAtom } from "../../atoms/widget-atoms";
+import { useState } from "react";
 
 export const WidgetSelectionScreen = () => {
   const setScreen = useSetAtom(screenAtom);
   const setErrorMessage = useSetAtom(errorMessageAtom);
+  const setConversationId = useSetAtom(conversationIdAtom);
   const organizationId = useAtomValue(organizationIdAtom);
   const contactSessionId = useAtomValue(contactSessionIdAtomFamily(organizationId || ""));
 
   const createConversation = useMutation(api.public.conversations.create);
-
+  const [isPending, setIsPending] = useState(false);
   const handleNewConversation = async () => {
     if (!organizationId) {
       setScreen("error");
@@ -31,16 +33,20 @@ export const WidgetSelectionScreen = () => {
       setErrorMessage("Contact session not found");
       return;
     }
+    setIsPending(true);
     try {
+
       const conversationId = await createConversation({
         organizationId,
         contactSessionId,
       });
+      setConversationId(conversationId);
       setScreen("chat");
 
-    } catch (error) {
-      setScreen("error");
-      setErrorMessage("Failed to create conversation");
+    } catch {
+      setScreen("auth");
+    } finally {
+      setIsPending(false);
     }
 
   };
@@ -56,7 +62,7 @@ export const WidgetSelectionScreen = () => {
         </div>
       </WidgetHeader>
       <div className="flex flex-1 flex-col gap-y-4 overflow-y-auto p-4 ">
-        <Button className="h-16 w-full justify-between" variant={"outline"} onClick={handleNewConversation}>
+        <Button className="h-16 w-full justify-between" variant={"outline"} onClick={() => handleNewConversation()} disabled={isPending}>
           <div className="flex items-center gap-x-2">
             <MessageSquareTextIcon className="size-4" />
             <span>Start Chat</span>
