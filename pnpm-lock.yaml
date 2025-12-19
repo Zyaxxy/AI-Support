@@ -265,6 +265,9 @@ importers:
       '@clerk/backend':
         specifier: ^2.23.0
         version: 2.23.0(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@convex-dev/agent':
+        specifier: ^0.3.2
+        version: 0.3.2(@ai-sdk/provider-utils@3.0.19(zod@3.25.76))(ai@5.0.115(zod@3.25.76))(convex-helpers@0.1.108(@standard-schema/spec@1.1.0)(convex@1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76))(convex@1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1))(react@19.1.1)
       convex:
         specifier: 1.25.4
         version: 1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
@@ -400,6 +403,22 @@ importers:
         version: 5.9.2
 
 packages:
+
+  '@ai-sdk/gateway@2.0.22':
+    resolution: {integrity: sha512-6fHjDfCbjfj4vyMExuLei7ir2///E5sNwNZaobdJsJIxJjDSsjzSLGO/aUI7p9eOnB8XctDrDSF5ilwDGpi6eg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider-utils@3.0.19':
+    resolution: {integrity: sha512-W41Wc9/jbUVXVwCN/7bWa4IKe8MtxO3EyA0Hfhx6grnmiYlCvpI8neSYWFE0zScXJkgA/YK3BRybzgyiXuu6JA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
+
+  '@ai-sdk/provider@2.0.0':
+    resolution: {integrity: sha512-6o7Y2SeO9vFKB8lArHXehNuusnpddKPk7xqL7T2/b+OvXMRIXUO1rR4wcv1hAFUAT9avGZshty3Wlua/XA7TvA==}
+    engines: {node: '>=18'}
 
   '@alloc/quick-lru@5.2.0':
     resolution: {integrity: sha512-UrcABB+4bUrFABwbluTIBErXwvbsU/V7TZWfmbgJfbkwiBuziS9gxdODUyuiecfdGQ85jglMW6juS3+z5TsKLw==}
@@ -538,6 +557,18 @@ packages:
   '@clerk/types@4.84.1':
     resolution: {integrity: sha512-0lLz3u8u0Ot5ZUObU+8JJLOeiHHnruShJMeLAHNryp1d5zANPQquOyagamxbkoV1K2lAf8ld3liobs3EBzll6Q==}
     engines: {node: '>=18.17.0'}
+
+  '@convex-dev/agent@0.3.2':
+    resolution: {integrity: sha512-TMFReXejAIUE22OOn8PYvoOseAqwVOPm4WZU554GFk0lJ9kcNCGRJP/T1NTZfSBXrSaSUjETMFv2vEfXbG+4Qg==}
+    peerDependencies:
+      '@ai-sdk/provider-utils': ^3.0.7
+      ai: ^5.0.29
+      convex: ^1.24.8
+      convex-helpers: ^0.1.103
+      react: ^18.3.1 || ^19.0.0
+    peerDependenciesMeta:
+      react:
+        optional: true
 
   '@cspotcode/source-map-support@0.8.1':
     resolution: {integrity: sha512-IchNf6dN4tHoMFIn/7OE8LWZ19Y6q/67Bmf6vnGREv8RSbBVb9LPJxEcnwrcwX6ixSvaiGoomAUvu4YSxXrVgw==}
@@ -2310,6 +2341,9 @@ packages:
   '@stablelib/base64@1.0.1':
     resolution: {integrity: sha512-1bnPQqSxSuc3Ii6MhBysoWCg58j97aUjuCSZrGSmDxNqtytIi0k8utUenAwTZN4V5mXXYGsVUI9zeBqy+jBOSQ==}
 
+  '@standard-schema/spec@1.1.0':
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
   '@standard-schema/utils@0.3.0':
     resolution: {integrity: sha512-e7Mew686owMaPJVNNLs55PUvgz371nKgwsc4vxE49zsODpJEnxgxRo2y/OKrqueavXgZNMDVj3DdHFlaSAeU8g==}
 
@@ -2570,9 +2604,16 @@ packages:
     resolution: {integrity: sha512-ldgiJ+VAhQCfIjeOgu8Kj5nSxds0ktPOSO9p4+0VDH2R2pLvQraaM5Oen2d7NxzMCm+Sn/vJT+mv2H5u6b/3fA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
+  '@ungap/structured-clone@1.3.0':
+    resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
+
   '@vapi-ai/web@2.5.0':
     resolution: {integrity: sha512-I+XkLPG99kWspJ2AH4vky/vSgCui9ntb20n4/D9RSP6ChG3RHNvZVXoA79gKiY1fWmowuzBD7hL8sJbGHfJOJw==}
     engines: {node: '>=18.0.0'}
+
+  '@vercel/oidc@3.0.5':
+    resolution: {integrity: sha512-fnYhv671l+eTTp48gB4zEsTW/YtRgRPnkI2nT7x6qw5rkI1Lq2hTmQIpHPgyThI0znLK+vX2n9XxKdXZ7BUbbw==}
+    engines: {node: '>= 20'}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -2661,6 +2702,12 @@ packages:
   aggregate-error@3.1.0:
     resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
     engines: {node: '>=8'}
+
+  ai@5.0.115:
+    resolution: {integrity: sha512-aVuHx0orGxXvhyL7oXUyW8TnWQE6Al8f3Bl6VZjz0WHMV+WaACHPkSyvQ3wje2QCUGzdl5DBF5d+OaXyghPQyg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.25.76 || ^4.1.8
 
   ajv-formats@2.1.1:
     resolution: {integrity: sha512-Wx0Kx52hxE7C18hkMEggYlEifqWZtYaRgouJor+WMdPnQyEK13vgEWyVNup7SoeeoLMsr4kf5h6dOW11I15MUA==}
@@ -2932,6 +2979,28 @@ packages:
 
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
+
+  convex-helpers@0.1.108:
+    resolution: {integrity: sha512-5dHYX4Dy/qnBuvP5CI9ZKEwYtSlyQKK2MiIdGTVV8WUON5mWr/St8IeBxsJTBNh/vuBrlX0XPAZ1arbk4KQUdg==}
+    hasBin: true
+    peerDependencies:
+      '@standard-schema/spec': ^1.0.0
+      convex: ^1.25.4
+      hono: ^4.0.5
+      react: ^17.0.2 || ^18.0.0 || ^19.0.0
+      typescript: ^5.5
+      zod: ^3.25.0 || ^4.0.0
+    peerDependenciesMeta:
+      '@standard-schema/spec':
+        optional: true
+      hono:
+        optional: true
+      react:
+        optional: true
+      typescript:
+        optional: true
+      zod:
+        optional: true
 
   convex@1.25.4:
     resolution: {integrity: sha512-LiGZZTmbe5iHWwDOYfSA00w+uDM8kgLC0ohFJW0VgQlKcs8famHCE6yuplk4wwXyj9Lhb1+yMRfrAD2ZEquqHg==}
@@ -3287,6 +3356,10 @@ packages:
   events@3.3.0:
     resolution: {integrity: sha512-mQw+2fkQbALzQ7V0MY0IqdnXNOeTtP4r0lN9z7AAawCXgqea7bDii20AYrIBrFd/Hx0M2Ocz6S111CaFkUcb0Q==}
     engines: {node: '>=0.8.x'}
+
+  eventsource-parser@3.0.6:
+    resolution: {integrity: sha512-Vo1ab+QXPzZ4tCa8SwIHJFaSzy4R6SHf7BY79rFBDf0idraZWAkYrDjDj8uWaSm3S2TK+hJ7/t1CEmZ7jXw+pg==}
+    engines: {node: '>=18.0.0'}
 
   execa@5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}
@@ -3813,6 +3886,9 @@ packages:
   json-schema-traverse@1.0.0:
     resolution: {integrity: sha512-NM8/P9n3XjXhIZn1lLhkFaACTOURQXjWhV4BA/RnOv8xvgqtqpAX9IO4mRQxSx1Rlo4tqzeqb0sOlruaOy3dug==}
 
+  json-schema@0.4.0:
+    resolution: {integrity: sha512-es94M3nTIfsEPisRafak+HDLfHXnKBhV3vU5eqPcS3flIWqcxJWgXHXiey3YrpaNsanY5ei1VoYEbOzijuq9BA==}
+
   json-stable-stringify-without-jsonify@1.0.1:
     resolution: {integrity: sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==}
 
@@ -4065,6 +4141,7 @@ packages:
   next@15.4.5:
     resolution: {integrity: sha512-nJ4v+IO9CPmbmcvsPebIoX3Q+S7f6Fu08/dEWu0Ttfa+wVwQRh9epcmsyCPjmL2b8MxC+CkBR97jgDhUUztI3g==}
     engines: {node: ^18.18.0 || ^19.8.0 || >= 20.0.0}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -4086,6 +4163,7 @@ packages:
   next@16.0.1:
     resolution: {integrity: sha512-e9RLSssZwd35p7/vOa+hoDFggUZIUbZhIUSLZuETCwrCVvxOs87NamoUzT+vbcNAL8Ld9GobBnWOA6SbV/arOw==}
     engines: {node: '>=20.9.0'}
+    deprecated: This version has a security vulnerability. Please upgrade to a patched version. See https://nextjs.org/blog/CVE-2025-66478 for more details.
     hasBin: true
     peerDependencies:
       '@opentelemetry/api': ^1.1.0
@@ -5088,6 +5166,24 @@ packages:
 
 snapshots:
 
+  '@ai-sdk/gateway@2.0.22(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.19(zod@3.25.76)
+      '@vercel/oidc': 3.0.5
+      zod: 3.25.76
+
+  '@ai-sdk/provider-utils@3.0.19(zod@3.25.76)':
+    dependencies:
+      '@ai-sdk/provider': 2.0.0
+      '@standard-schema/spec': 1.1.0
+      eventsource-parser: 3.0.6
+      zod: 3.25.76
+
+  '@ai-sdk/provider@2.0.0':
+    dependencies:
+      json-schema: 0.4.0
+
   '@alloc/quick-lru@5.2.0': {}
 
   '@ampproject/remapping@2.3.0':
@@ -5277,6 +5373,16 @@ snapshots:
   '@clerk/types@4.84.1':
     dependencies:
       csstype: 3.1.3
+
+  '@convex-dev/agent@0.3.2(@ai-sdk/provider-utils@3.0.19(zod@3.25.76))(ai@5.0.115(zod@3.25.76))(convex-helpers@0.1.108(@standard-schema/spec@1.1.0)(convex@1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76))(convex@1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1))(react@19.1.1)':
+    dependencies:
+      '@ai-sdk/provider-utils': 3.0.19(zod@3.25.76)
+      ai: 5.0.115(zod@3.25.76)
+      convex: 1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
+      convex-helpers: 0.1.108(@standard-schema/spec@1.1.0)(convex@1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76)
+    optionalDependencies:
+      '@ungap/structured-clone': 1.3.0
+      react: 19.1.1
 
   '@cspotcode/source-map-support@0.8.1':
     dependencies:
@@ -6987,6 +7093,8 @@ snapshots:
 
   '@stablelib/base64@1.0.1': {}
 
+  '@standard-schema/spec@1.1.0': {}
+
   '@standard-schema/utils@0.3.0': {}
 
   '@swc/helpers@0.5.15':
@@ -7296,10 +7404,15 @@ snapshots:
       '@typescript-eslint/types': 8.39.0
       eslint-visitor-keys: 4.2.1
 
+  '@ungap/structured-clone@1.3.0':
+    optional: true
+
   '@vapi-ai/web@2.5.0':
     dependencies:
       '@daily-co/daily-js': 0.84.0
       events: 3.3.0
+
+  '@vercel/oidc@3.0.5': {}
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
@@ -7411,6 +7524,14 @@ snapshots:
     dependencies:
       clean-stack: 2.2.0
       indent-string: 4.0.0
+
+  ai@5.0.115(zod@3.25.76):
+    dependencies:
+      '@ai-sdk/gateway': 2.0.22(zod@3.25.76)
+      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider-utils': 3.0.19(zod@3.25.76)
+      '@opentelemetry/api': 1.9.0
+      zod: 3.25.76
 
   ajv-formats@2.1.1(ajv@8.17.1):
     optionalDependencies:
@@ -7732,6 +7853,15 @@ snapshots:
       upper-case: 1.1.3
 
   convert-source-map@2.0.0: {}
+
+  convex-helpers@0.1.108(@standard-schema/spec@1.1.0)(convex@1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1))(react@19.1.1)(typescript@5.9.3)(zod@3.25.76):
+    dependencies:
+      convex: 1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1)
+    optionalDependencies:
+      '@standard-schema/spec': 1.1.0
+      react: 19.1.1
+      typescript: 5.9.3
+      zod: 3.25.76
 
   convex@1.25.4(@clerk/clerk-react@5.46.1(react-dom@19.1.1(react@19.1.1))(react@19.1.1))(react@19.1.1):
     dependencies:
@@ -8186,6 +8316,8 @@ snapshots:
   eventemitter3@4.0.7: {}
 
   events@3.3.0: {}
+
+  eventsource-parser@3.0.6: {}
 
   execa@5.1.1:
     dependencies:
@@ -8738,6 +8870,8 @@ snapshots:
   json-schema-traverse@0.4.1: {}
 
   json-schema-traverse@1.0.0: {}
+
+  json-schema@0.4.0: {}
 
   json-stable-stringify-without-jsonify@1.0.1: {}
 
