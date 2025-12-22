@@ -103,11 +103,24 @@ export const WidgetChatScreen = () => {
           <MenuIcon />
         </Button>
       </WidgetHeader>
-      <div className="flex flex-1 flex-col items-center justify-center gap-y-4 p-4 text-muted-foreground">
-        {JSON.stringify(conversation)}
-        {JSON.stringify(messages)}
+      <AIConversation>
+        <AIConversationContent>
+          {toUIMessages(messages.results ?? [])?.map((message) => {
+            return (
+              <AIMessage
+                from={message.role === "user" ? "user" : "assistant"}
+                key={message.id}
+              >
+                <AIMessageContent>
+                  <AIResponse>{message.text}</AIResponse>
+                </AIMessageContent>
+              </AIMessage>
+            )
+          })}
+        </AIConversationContent>
+        <AIConversationScrollButton />
 
-      </div>
+      </AIConversation>
     </>
   );
 };
