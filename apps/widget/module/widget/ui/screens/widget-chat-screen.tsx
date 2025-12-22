@@ -1,4 +1,7 @@
 "use client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Schema, z } from "zod";
+import { useForm } from "react-hook-form";
 import { useThreadMessages, toUIMessages } from "@convex-dev/agent/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { WidgetHeader } from "../components/widget-header";
@@ -7,7 +10,7 @@ import { ChevronLeftIcon, MenuIcon } from "lucide-react";
 import { conversationIdAtom, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
 
 import { contactSessionIdAtomFamily } from "../../atoms/widget-atoms";
-import { useQuery } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import {
   AIConversation,
@@ -28,23 +31,27 @@ import {
 } from "@workspace/ui/components/ai/message";
 
 import { AISuggestion, AISuggestions } from "@workspace/ui/components/ai/suggestion";
+
+const schema = z.object({
+  prompt: z.string().min(1, "Message is required"),
+});
+
 export const WidgetChatScreen = () => {
   const setScreen = useSetAtom(screenAtom);
   const setConversationId = useSetAtom(conversationIdAtom);
 
   const conversationId = useAtomValue(conversationIdAtom)
   const contactSessionId = useAtomValue(contactSessionIdAtomFamily(useAtomValue(organizationIdAtom) || ""));
-
+  const onBack = () => {
+    setConversationId(null);
+    setScreen("selection");
+  }
 
   const conversation = useQuery(api.public.conversations.getOne, conversationId && contactSessionId ? {
     conversationId,
     contactSessionId,
   } : "skip");
 
-  const onBack = () => {
-    setConversationId(null);
-    setScreen("selection");
-  }
 
   const messages = useThreadMessages(api.public.messages.getMany,
     conversation?.threadId && contactSessionId
@@ -55,7 +62,25 @@ export const WidgetChatScreen = () => {
       : "skip",
     { initialNumItems: 10 }
   );
+  const form = useForm<z.infer<typeof schema>>({
+    resolver: zodResolver(schema),
+    defaultValues: {
+      prompt: "",
+    },
+  });
 
+  const createMessage = useAction(api.public.messages.create);
+  const onSubmit = async (values: z.infer<typeof schema>) => {
+    if (!conversation || !contactSessionId) {
+      return;
+    }
+    form.reset();
+    await createMessage({
+      threadId: conversation?.threadId,
+      contactSessionId: contactSessionId,
+      prompt: values.prompt,
+    })
+  };
   return (
     <>
       <WidgetHeader className="flex items-center justify-between">
@@ -79,6 +104,7 @@ export const WidgetChatScreen = () => {
         </Button>
       </WidgetHeader>
       <div className="flex flex-1 flex-col items-center justify-center gap-y-4 p-4 text-muted-foreground">
+        {JSON.stringify(conversation)}
         {JSON.stringify(messages)}
 
       </div>
