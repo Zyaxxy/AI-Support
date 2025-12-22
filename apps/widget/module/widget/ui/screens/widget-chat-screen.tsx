@@ -1,4 +1,5 @@
 "use client";
+import { useThreadMessages, toUIMessages } from "@convex-dev/agent/react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { WidgetHeader } from "../components/widget-header";
 import { Button } from "@workspace/ui/components/button";
@@ -8,8 +9,25 @@ import { conversationIdAtom, organizationIdAtom, screenAtom } from "../../atoms/
 import { contactSessionIdAtomFamily } from "../../atoms/widget-atoms";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import {
+  AIConversation,
+  AIConversationContent,
+  AIConversationScrollButton
+} from "@workspace/ui/components/ai/conversation";
+import {
+  AIInput,
+  AIInputSubmit,
+  AIInputTextarea,
+  AIInputToolbar,
+  AIInputTools,
+} from "@workspace/ui/components/ai/input";
+import { AIResponse } from "@workspace/ui/components/ai/response";
+import {
+  AIMessage,
+  AIMessageContent,
+} from "@workspace/ui/components/ai/message";
 
-
+import { AISuggestion, AISuggestions } from "@workspace/ui/components/ai/suggestion";
 export const WidgetChatScreen = () => {
   const setScreen = useSetAtom(screenAtom);
   const setConversationId = useSetAtom(conversationIdAtom);
@@ -27,6 +45,16 @@ export const WidgetChatScreen = () => {
     setConversationId(null);
     setScreen("selection");
   }
+
+  const messages = useThreadMessages(api.public.messages.getMany,
+    conversation?.threadId && contactSessionId
+      ? {
+        threadId: conversation?.threadId,
+        contactSessionId,
+      }
+      : "skip",
+    { initialNumItems: 10 }
+  );
 
   return (
     <>
@@ -51,7 +79,7 @@ export const WidgetChatScreen = () => {
         </Button>
       </WidgetHeader>
       <div className="flex flex-1 flex-col items-center justify-center gap-y-4 p-4 text-muted-foreground">
-        {JSON.stringify(conversation)}
+        {JSON.stringify(messages)}
 
       </div>
     </>
