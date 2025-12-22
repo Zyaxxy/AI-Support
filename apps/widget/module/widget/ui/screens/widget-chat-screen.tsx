@@ -115,6 +115,7 @@ export const WidgetChatScreen = () => {
                   <AIResponse>{message.text}</AIResponse>
                 </AIMessageContent>
               </AIMessage>
+              {//TODO: Add Other things}
             )
           })}
         </AIConversationContent>
