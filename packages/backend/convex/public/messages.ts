@@ -1,5 +1,3 @@
-"use node";
-
 import { action, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
