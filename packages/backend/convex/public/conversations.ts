@@ -25,7 +25,7 @@ export const create = mutation({
             message: {
                 role: "assistant",
                 //TODO: Add system prompt
-                content: "You are a helpful assistant.",
+                content: "Hey! How can I help you today?",
             },
         })
         const conversationId = await ctx.db.insert("conversations", {

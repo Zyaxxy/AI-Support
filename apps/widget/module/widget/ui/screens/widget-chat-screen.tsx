@@ -8,7 +8,7 @@ import { WidgetHeader } from "../components/widget-header";
 import { Button } from "@workspace/ui/components/button";
 import { ChevronLeftIcon, MenuIcon } from "lucide-react";
 import { conversationIdAtom, organizationIdAtom, screenAtom } from "../../atoms/widget-atoms";
-
+import { Form, FormField } from "@workspace/ui/components/form";
 import { contactSessionIdAtomFamily } from "../../atoms/widget-atoms";
 import { useAction, useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
@@ -115,13 +115,45 @@ export const WidgetChatScreen = () => {
                   <AIResponse>{message.text}</AIResponse>
                 </AIMessageContent>
               </AIMessage>
-              {//TODO: Add Other things}
             )
           })}
         </AIConversationContent>
         <AIConversationScrollButton />
-
       </AIConversation>
+      <Form {...form}>
+        <AIInput className="rounded-none border-x-0 border-b-0" onSubmit={form.handleSubmit(onSubmit)}>
+          <FormField
+            control={form.control}
+            disabled={conversation?.status === "resolved"}
+            name="prompt"
+            render={({ field }) => (
+              <AIInputTextarea
+                disabled={conversation?.status === "resolved"}
+                onChange={field.onChange}
+                value={field.value}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    form.handleSubmit(onSubmit)();
+                  }
+                }}
+                placeholder={
+                  conversation?.status === "resolved"
+                    ? "Conversation resolved"
+                    : "Type your message here..."
+                }
+              />
+            )}
+          />
+          <AIInputToolbar>
+            <AIInputTools>
+              <AIInputSubmit disabled={conversation?.status === "resolved" || !form.formState.isValid}
+                status="ready"
+                type="submit" />
+            </AIInputTools>
+          </AIInputToolbar>
+        </AIInput>
+      </Form>
     </>
   );
 };
