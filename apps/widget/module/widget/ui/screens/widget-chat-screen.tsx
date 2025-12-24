@@ -29,8 +29,10 @@ import {
   AIMessage,
   AIMessageContent,
 } from "@workspace/ui/components/ai/message";
-
+import { InfiniteScrollTrigger } from "@workspace/ui/components/InfiniteScrollTrigger";
+import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { AISuggestion, AISuggestions } from "@workspace/ui/components/ai/suggestion";
+import { useRef } from "react";
 
 const schema = z.object({
   prompt: z.string().min(1, "Message is required"),
@@ -62,6 +64,15 @@ export const WidgetChatScreen = () => {
       : "skip",
     { initialNumItems: 10 }
   );
+
+  const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } = useInfiniteScroll({
+    status: messages.status,
+    loadmore: messages.loadMore,
+    loadSize: 10,
+    observerEnabled: true,
+  });
+  const infiniteScrollRef = useRef<HTMLDivElement>(null);
+
   const form = useForm<z.infer<typeof schema>>({
     resolver: zodResolver(schema),
     defaultValues: {
