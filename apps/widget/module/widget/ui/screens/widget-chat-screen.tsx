@@ -29,10 +29,9 @@ import {
   AIMessage,
   AIMessageContent,
 } from "@workspace/ui/components/ai/message";
-import { InfiniteScrollTrigger } from "@workspace/ui/components/InfiniteScrollTrigger";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
-import { AISuggestion, AISuggestions } from "@workspace/ui/components/ai/suggestion";
 import { useRef } from "react";
+import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 
 const schema = z.object({
   prompt: z.string().min(1, "Message is required"),
@@ -125,6 +124,7 @@ export const WidgetChatScreen = () => {
                 <AIMessageContent>
                   <AIResponse>{message.text}</AIResponse>
                 </AIMessageContent>
+                {message.role === "assistant" && <DicebearAvatar seed="Assistant" size={32} />}
               </AIMessage>
             )
           })}
