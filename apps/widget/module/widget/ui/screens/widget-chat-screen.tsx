@@ -30,6 +30,7 @@ import {
   AIMessageContent,
 } from "@workspace/ui/components/ai/message";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
+import { InfiniteScrollTrigger } from "@workspace/ui/components/InfiniteScrollTrigger";
 import { useRef } from "react";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 
@@ -61,14 +62,14 @@ export const WidgetChatScreen = () => {
         contactSessionId,
       }
       : "skip",
-    { initialNumItems: 5 }
+    { initialNumItems: 10 }
   );
 
   const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } = useInfiniteScroll({
     status: messages.status,
     loadmore: messages.loadMore,
-    loadSize: 5,
-    observerEnabled: false,
+    loadSize: 10,
+    observerEnabled: true,
   });
   const infiniteScrollRef = useRef<HTMLDivElement>(null);
 
@@ -115,6 +116,12 @@ export const WidgetChatScreen = () => {
       </WidgetHeader>
       <AIConversation>
         <AIConversationContent>
+          <InfiniteScrollTrigger
+            ref={topElementRef}
+            isLoadingMore={isLoadingMore}
+            canLoadMore={canLoadMore}
+            onLoadMore={handleLoadMore}
+          />
           {toUIMessages(messages.results ?? [])?.map((message) => {
             return (
               <AIMessage

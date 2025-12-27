@@ -11,6 +11,10 @@ import { useAtomValue } from "jotai";
 import { usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import { conversationIdAtom } from "../../atoms/widget-atoms";
+import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
+import { InfiniteScrollTrigger } from "@workspace/ui/components/InfiniteScrollTrigger";
+import { WidgetFooter } from "../components/widget-footer";
+
 
 export const WidgetInboxScreen = () => {
   const setScreen = useSetAtom(screenAtom)
@@ -30,6 +34,13 @@ export const WidgetInboxScreen = () => {
       initialNumItems: 10,
     },
   );
+
+  const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } = useInfiniteScroll({
+    status: conversations.status,
+    loadmore: conversations.loadMore,
+    loadSize: 10,
+    observerEnabled: true,
+  });
 
   return (
     <>
@@ -70,8 +81,16 @@ export const WidgetInboxScreen = () => {
               </div>
             </Button>
           ))}
+          <InfiniteScrollTrigger
+            ref={topElementRef}
+            isLoadingMore={isLoadingMore}
+            canLoadMore={canLoadMore}
+            onLoadMore={handleLoadMore}
+          />
         </div>
+
       </div>
+      <WidgetFooter />
     </>
   );
 };

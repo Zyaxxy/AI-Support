@@ -33,10 +33,10 @@ export const DicebearAvatar = ({
             size,
         });
         return avatar.toDataUri();
-    }, [seed, size]);
+    }, [seed, size, ImageUrl]);
     const badgeSize = Math.round(size * 0.5);
     return <div className="relative inline-block" style={{ width: size, height: size }}>
-        <Avatar className={cn("border", className)} style={{ width: size, height: size }}>
+        <Avatar className={cn("", className)} style={{ width: size, height: size }}>
             <AvatarImage src={avatarSrc} alt="Image" />
         </Avatar>
         {badgeImageUrl && <div className={cn("absolute bottom-0 right-0 items-center justify-center overflow-hidden rounded-full border-2 border-background", badgeClassName)}

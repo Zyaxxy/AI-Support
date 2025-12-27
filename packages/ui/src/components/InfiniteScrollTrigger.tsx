@@ -1,6 +1,6 @@
 import { forwardRef } from "react";
-import { cn } from "../lib/utils.js";
-import { Button } from "./button.js";
+import { cn } from "@workspace/ui/lib/utils";
+import { Button } from "@workspace/ui/components/button";
 
 interface InfiniteScrollTriggerProps {
     canLoadMore: boolean;
