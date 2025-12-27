@@ -61,14 +61,14 @@ export const WidgetChatScreen = () => {
         contactSessionId,
       }
       : "skip",
-    { initialNumItems: 10 }
+    { initialNumItems: 5 }
   );
 
   const { topElementRef, handleLoadMore, canLoadMore, isLoadingMore } = useInfiniteScroll({
     status: messages.status,
     loadmore: messages.loadMore,
-    loadSize: 10,
-    observerEnabled: true,
+    loadSize: 5,
+    observerEnabled: false,
   });
   const infiniteScrollRef = useRef<HTMLDivElement>(null);
 
@@ -124,7 +124,7 @@ export const WidgetChatScreen = () => {
                 <AIMessageContent>
                   <AIResponse>{message.text}</AIResponse>
                 </AIMessageContent>
-                {message.role === "assistant" && <DicebearAvatar seed="Assistant" size={32} />}
+                {message.role === "assistant" && <DicebearAvatar ImageUrl="logo.svg" size={32} seed="Assistant" />}
               </AIMessage>
             )
           })}
