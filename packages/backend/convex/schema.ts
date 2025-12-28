@@ -17,7 +17,7 @@ export default defineSchema({
         .index("by_organizationId", ["organizationId"])
         .index("by_contactSessionId", ["contactSessionId"])
         .index("by_threadId", ["threadId"])
-        .index("by_status", ["status"]),
+        .index("by_status_and_organization_id", ["status", "organizationId"]),
 
     contactSessions: defineTable({
         name: v.string(),

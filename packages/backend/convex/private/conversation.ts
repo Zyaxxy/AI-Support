@@ -3,7 +3,8 @@ import { components } from "../_generated/api";
 import { ConvexError, v } from "convex/values";
 import { SupportAgent } from "../system/aiAgents/supportAgent";
 import { MessageDoc, saveMessage } from "@convex-dev/agent";
-import { paginationOptsValidator } from "convex/server";
+import { paginationOptsValidator, PaginationResult } from "convex/server";
+import { Doc } from "../_generated/dataModel";
 
 export const getMany = query({
     args: {
@@ -18,42 +19,63 @@ export const getMany = query({
     },
     handler: async (ctx, args) => {
         const identity = await ctx.auth.getUserIdentity();
-        if (!identity) {
+        if (identity === null) {
             throw new ConvexError({
                 code: "UNAUTHORIZED",
                 message: "Identity not found"
             })
         }
-        const orgId = identity.ordId as string;
+        const orgId = identity.orgId as string;
 
-        const conversations = await ctx.db.query("conversations").
-            withIndex("by_organizationId", (q) => q.eq("organizationId", orgId)).order("desc").
-            paginate(args.paginationOpts)
-
-        const conversationWithLastMessage = await Promise.all(conversations.page.map(async (conversation) => {
-            let lastMessage: MessageDoc | null = null;
-            const Messages = await SupportAgent.listMessages(ctx, {
-                threadId: conversation.threadId,
-                paginationOpts: {
-                    numItems: 1,
-                    cursor: null,
+        if (!orgId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Organization not found"
+            })
+        }
+        let conversations: PaginationResult<Doc<"conversations">>;
+        if (args.status) {
+            conversations = await ctx.db.query("conversations").
+                withIndex("by_status_and_organization_id", (q) => q
+                    .eq("status", args.status as "unresolved" | "escalated" | "resolved")
+                    .eq("organizationId", orgId))
+                .order("desc")
+                .paginate(args.paginationOpts)
+        } else {
+            conversations = await ctx.db.query("conversations").
+                withIndex("by_organizationId", (q) => q.eq("organizationId", orgId))
+                .order("desc")
+                .paginate(args.paginationOpts)
+        }
+        const conversationWithAdditionalData = await Promise.all(
+            conversations.page.map(async (conversation) => {
+                let lastMessage: MessageDoc | null = null;
+                const contactSession = await ctx.db.get(conversation.contactSessionId);
+                if (!contactSession) {
+                    return null;
+                }
+                const Messages = await SupportAgent.listMessages(ctx, {
+                    threadId: conversation.threadId,
+                    paginationOpts: {
+                        numItems: 1,
+                        cursor: null,
+                    }
+                })
+                if (Messages.page.length > 0) {
+                    lastMessage = Messages.page[0] ?? null;
+                }
+                return {
+                    ...conversation,
+                    lastMessage,
+                    contactSession,
                 }
             })
-            if (Messages.page.length > 0) {
-                lastMessage = Messages.page[0] ?? null;
-            }
-            return {
-                _id: conversation._id,
-                _creationTime: conversation._creationTime,
-                status: conversation.status,
-                organizationId: conversation.organizationId,
-                threadId: conversation.threadId,
-                lastMessage,
-            }
-        }))
+        );
+        const validConversations = conversationWithAdditionalData.filter(
+            (conv): conv is NonNullable<typeof conv> => conv !== null);
         return {
             ...conversations,
-            page: conversationWithLastMessage,
+            page: validConversations,
         }
     },
 })
@@ -91,39 +113,4 @@ export const create = mutation({
         return conversationId;
     },
 
-});
-
-export const getOne = query({
-    args: {
-        conversationId: v.id("conversations"),
-        contactSessionId: v.id("contactSessions"),
-    },
-    handler: async (ctx, args) => {
-        const session = await ctx.db.get(args.contactSessionId);
-        if (!session || session.expiresAt < Date.now()) {
-            throw new ConvexError({
-                code: "UNAUTHORIZED",
-                message: "Invalid session"
-            })
-        }
-        const conversation = await ctx.db.get(args.conversationId);
-        if (!conversation) {
-            throw new ConvexError({
-                code: "NOT_FOUND",
-                message: "Conversation not found"
-            })
-        }
-
-        if (conversation.contactSessionId !== session._id) {
-            throw new ConvexError({
-                code: "UNAUTHORIZED",
-                message: "Invalid session"
-            })
-        }
-        return {
-            _id: conversation._id,
-            status: conversation.status,
-            threadId: conversation.threadId,
-        };
-    },
 });
