@@ -18,6 +18,7 @@ export const getMany = query({
         paginationOpts: paginationOptsValidator,
     },
     handler: async (ctx, args) => {
+
         const identity = await ctx.auth.getUserIdentity();
         if (identity === null) {
             throw new ConvexError({
