@@ -1,6 +1,6 @@
 "use client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { ListIcon, ArrowRightIcon, ArrowUpIcon, CheckIcon, Link } from "lucide-react";
+import { ListIcon, ArrowRightIcon, ArrowUpIcon, CheckIcon, Link, CornerUpLeftIcon } from "lucide-react";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { usePaginatedQuery } from "convex/react";
 import { getCountryFromTimezone } from "../../../../lib/countryUtils";
@@ -8,6 +8,9 @@ import { api } from "@workspace/backend/_generated/api";
 import { cn } from "@workspace/ui/lib/utils";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { usePathname } from "next/navigation";
+import { InfiniteScrollTrigger } from "@workspace/ui/components/infinitescrolltrigger";
+import { formatDistanceToNow } from "date-fns";
+import { ConversationStatusIcon } from "@workspace/ui/components/conversation-status-icon";
 export const ConversationsPanel = () => {
     const pathname = usePathname();
     const conversations = usePaginatedQuery(api.private.conversation.getMany,
@@ -78,7 +81,30 @@ export const ConversationsPanel = () => {
                                 size={40}
                                 className="shrink-0"
                             />
-
+                            <div className="flex-1 ">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex w-full items-center gap-2" >
+                                        <span className="truncate font-bold ">
+                                            {conversation.contactSession.name}
+                                        </span>
+                                        <span className="ml-auto shrink-0 text-muted-foreground text-xs">
+                                            {formatDistanceToNow(conversation._creationTime)}
+                                        </span>
+                                    </div>
+                                    <div className="mt-1 flex items-center justify-between gap-2">
+                                        <div className="flex w-0 grow items-center gap-1">
+                                            {isLastMessageFromOperator && (
+                                                <CornerUpLeftIcon className="size-3 shrink-0 text-muted-foreground" />
+                                            )}
+                                            <span className={cn("line-clamp-1 text-xs text-muted-foreground",
+                                                !isLastMessageFromOperator && "font-bold text-black")}>
+                                                {conversation.lastMessage?.text}
+                                            </span>
+                                        </div>
+                                        <ConversationStatusIcon status={conversation.status} />
+                                    </div>
+                                </div>
+                            </div>
                         </Link>
                     )
                 })}
