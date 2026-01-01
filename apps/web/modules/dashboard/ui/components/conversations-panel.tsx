@@ -1,6 +1,6 @@
 "use client";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { ListIcon, ArrowRightIcon, ArrowUpIcon, CheckIcon, Link, CornerUpLeftIcon } from "lucide-react";
+import { ListIcon, ArrowRightIcon, ArrowUpIcon, CheckIcon, CornerUpLeftIcon } from "lucide-react";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { usePaginatedQuery } from "convex/react";
 import { getCountryFromTimezone } from "../../../../lib/countryUtils";
@@ -8,6 +8,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { cn } from "@workspace/ui/lib/utils";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinitescrolltrigger";
 import { formatDistanceToNow } from "date-fns";
 import { ConversationStatusIcon } from "@workspace/ui/components/conversation-status-icon";
