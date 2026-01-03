@@ -12,11 +12,14 @@ import Link from "next/link";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinitescrolltrigger";
 import { formatDistanceToNow } from "date-fns";
 import { ConversationStatusIcon } from "@workspace/ui/components/conversation-status-icon";
+import { useAtom } from "jotai";
+import { statusFilterAtom } from "../../atoms";
 export const ConversationsPanel = () => {
     const pathname = usePathname();
+    const [statusFilter, setStatusFilter] = useAtom(statusFilterAtom);
     const conversations = usePaginatedQuery(api.private.conversation.getMany,
         {
-            status: undefined,
+            status: statusFilter === "all" ? undefined : statusFilter,
         },
         {
             initialNumItems: 10,
@@ -30,8 +33,8 @@ export const ConversationsPanel = () => {
                 <div className="flex items-center justify-between gap-3">
                     <h2 className="text-sm font-semibold text-foreground">Conversations</h2>
                     <Select defaultValue="all"
-                        onValueChange={(value) => console.log(value)}
-                        value="all">
+                        onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}
+                        value={statusFilter}>
                         <SelectTrigger className="h-8 w-[130px] border-border/50 bg-background/50 px-3 text-xs shadow-sm hover:bg-accent/50 hover:border-primary/30 transition-all duration-200">
                             <SelectValue placeholder="Filter" />
                         </SelectTrigger>
