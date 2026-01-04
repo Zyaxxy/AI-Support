@@ -14,6 +14,8 @@ import { formatDistanceToNow } from "date-fns";
 import { ConversationStatusIcon } from "@workspace/ui/components/conversation-status-icon";
 import { useAtom } from "jotai";
 import { statusFilterAtom } from "../../atoms";
+import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
+import { ConversationSkeleton } from "./conversation-skeleton";
 export const ConversationsPanel = () => {
     const pathname = usePathname();
     const [statusFilter, setStatusFilter] = useAtom(statusFilterAtom);
@@ -25,6 +27,18 @@ export const ConversationsPanel = () => {
             initialNumItems: 10,
         },
     );
+    const {
+        topElementRef,
+        handleLoadMore,
+        isLoadingMore,
+        canLoadMore,
+        isLoadingFirstPage,
+    } = useInfiniteScroll({
+        status: conversations.status,
+        loadmore: conversations.loadMore,
+        loadSize: 10,
+        observerEnabled: true,
+    });
 
     return (
         <div className="flex flex-col h-full w-full bg-background/50 backdrop-blur-sm">
@@ -71,7 +85,13 @@ export const ConversationsPanel = () => {
             {/* Conversations List */}
             <ScrollArea className="flex-1 h-[calc(100vh-65px)]">
                 <div className="flex flex-col">
-                    {conversations.results.map((conversation) => {
+                    {/* Skeleton Loader for Initial Load */}
+                    {isLoadingFirstPage && (
+                        <ConversationSkeleton count={5} />
+                    )}
+
+                    {/* Actual Conversations */}
+                    {!isLoadingFirstPage && conversations.results.map((conversation) => {
                         const isLastMessageFromOperator = conversation.lastMessage?.message?.role !== "user";
                         const country = getCountryFromTimezone(conversation.contactSession.metadata?.timezone || "");
                         const countryFlagUrl = `https://flagcdn.com/w20/${country?.code?.toLowerCase()}`;
@@ -148,7 +168,7 @@ export const ConversationsPanel = () => {
                     })}
 
                     {/* Empty State */}
-                    {conversations.results.length === 0 && (
+                    {!isLoadingFirstPage && conversations.results.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
                             <div className="size-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
                                 <ListIcon className="size-7 text-muted-foreground/40" />
@@ -160,9 +180,10 @@ export const ConversationsPanel = () => {
 
                     {/* Loading More Indicator */}
                     <InfiniteScrollTrigger
-                        onLoadMore={() => conversations.loadMore(10)}
-                        canLoadMore={conversations.status === "CanLoadMore"}
-                        isLoadingMore={conversations.status === "LoadingMore"}
+                        canLoadMore={canLoadMore}
+                        isLoadingMore={isLoadingMore}
+                        ref={topElementRef}
+                        onLoadMore={handleLoadMore}
                     />
                 </div>
             </ScrollArea>
