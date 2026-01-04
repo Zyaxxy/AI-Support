@@ -95,11 +95,11 @@ export const ConversationsPanel = () => {
                         const isLastMessageFromOperator = conversation.lastMessage?.message?.role !== "user";
                         const country = getCountryFromTimezone(conversation.contactSession.metadata?.timezone || "");
                         const countryFlagUrl = `https://flagcdn.com/w20/${country?.code?.toLowerCase()}`;
-                        const isActive = pathname === `/dashboard/conversations/${conversation._id}`;
+                        const isActive = pathname === `/conversations/${conversation._id}`;
 
                         return (
                             <Link
-                                href={`/dashboard/conversations/${conversation._id}`}
+                                href={`/conversations/${conversation._id}`}
                                 key={conversation._id}
                                 className={cn(
                                     "relative group flex cursor-pointer items-start gap-3.5 border-b border-border/40 px-4 py-4 transition-all duration-200",
