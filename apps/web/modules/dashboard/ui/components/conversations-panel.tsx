@@ -41,6 +41,7 @@ export const ConversationsPanel = () => {
     });
 
     return (
+        //TODO: Add border-r as Same as Sidebar
         <div className="flex flex-col h-full w-full bg-background/50 backdrop-blur-sm">
             {/* Header Section with Filter */}
             <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3">
