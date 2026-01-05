@@ -2,7 +2,7 @@
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
-import { useQuery } from "convex/react";
+import { useQuery, useMutation } from "convex/react";
 import { MoreHorizontal, MoreHorizontalIcon, Wand2Icon } from "lucide-react";
 import {
     AIConversation,
@@ -30,7 +30,6 @@ import { toUIMessages, useThreadMessages } from "@convex-dev/agent/react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { threadId } from "worker_threads";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 const formSchema = z.object({
     message: z.string().min(1, "Message is required"),
@@ -46,8 +45,17 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
             message: "",
         },
     });
+    const createMessage = useMutation(api.private.messages.create);
     const onSubmit = async (values: z.infer<typeof formSchema>) => {
-        console.log(values);
+        try {
+            await createMessage({
+                prompt: values.message,
+                conversationId: conversationId
+            });
+            form.reset();
+        } catch (error) {
+            console.error(error);
+        }
     };
 
     return (
