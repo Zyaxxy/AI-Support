@@ -3,7 +3,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import { useQuery } from "convex/react";
-import { MoreHorizontal, MoreHorizontalIcon } from "lucide-react";
+import { MoreHorizontal, MoreHorizontalIcon, Wand2Icon } from "lucide-react";
 import {
     AIConversation,
     AIConversationContent,
@@ -74,6 +74,48 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
                 </AIConversationContent>
                 <AIConversationScrollButton />
             </AIConversation>
+            <div className="p-2">
+                <Form {...form}>
+                    <AIInput onSubmit={form.handleSubmit(onSubmit)}>
+                        <FormField
+                            control={form.control}
+                            disabled={conversation?.status === "resolved"}
+                            name="message"
+                            render={({ field }) => (
+                                <AIInputTextarea
+                                    disabled={conversation?.status === "resolved" || form.formState.isSubmitting}
+                                    //TODO: Or if enhancing Prompt
+                                    onChange={field.onChange}
+                                    onKeyDown={(e) => {
+                                        if (e.key == "Enter" && !e.shiftKey) {
+                                            e.preventDefault();
+                                            form.handleSubmit(onSubmit)();
+                                        }
+                                    }}
+                                    placeholder={conversation?.status === "resolved" ? "Conversation resolved" : "Type your message..."}
+                                    value={field.value}
+                                />
+                            )}
+                        />
+                        <AIInputToolbar>
+                            <AIInputTools>
+                                <AIInputButton>
+                                    <Wand2Icon />
+                                    Enhance
+                                </AIInputButton>
+                            </AIInputTools>
+                            <AIInputSubmit disabled={conversation?.status === "resolved" || form.formState.isSubmitting ||
+                                !form.formState.isValid
+                            }
+                                status="ready"
+                                type="submit" />
+
+                        </AIInputToolbar>
+                    </AIInput>
+
+                </Form>
+
+            </div>
         </div>
     );
 };
