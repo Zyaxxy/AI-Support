@@ -1,35 +1,34 @@
-import { action, query } from "../_generated/server";
+import { action, mutation, query } from "../_generated/server";
 import { ConvexError, v } from "convex/values";
-import { internal } from "../_generated/api";
+
 import { SupportAgent } from "../../convex/system/aiAgents/supportAgent";
 import { paginationOptsValidator } from "convex/server";
+import { saveMessage } from "@convex-dev/agent";
+import { components } from "../_generated/api";
 
-export const create = action({
+export const create = mutation({
     args: {
         prompt: v.string(),
-        threadId: v.string(),
-        contactSessionId: v.id("contactSessions"),
+        conversationId: v.id("conversations"),
     },
     handler: async (ctx, args) => {
-        const contactSession = await ctx.runQuery(
-            internal.system.contactSessions.getOne,
-            {
-                contactSessionId: args.contactSessionId,
-            }
-        );
-        if (!contactSession || contactSession.expiresAt < Date.now()) {
+        const identity = await ctx.auth.getUserIdentity();
+        if (identity === null) {
             throw new ConvexError({
                 code: "UNAUTHORIZED",
-                message: "Invalid Session"
+                message: "Identity not found"
+            })
+        }
+        const orgId = identity.orgId as string;
+
+        if (!orgId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Organization not found"
             })
         }
 
-        const conversation = await ctx.runQuery(
-            internal.system.coversations.getByThreadId,
-            {
-                threadId: args.threadId,
-            }
-        );
+        const conversation = await ctx.db.get(args.conversationId);
         if (!conversation) {
             throw new ConvexError({
                 code: "CONVERSATION_NOT_FOUND",
@@ -44,11 +43,22 @@ export const create = action({
             })
         }
 
-        //TODO: Subscription
-        await SupportAgent.generateText(ctx, { threadId: args.threadId }, {
-            prompt: args.prompt,
-        })
+        if (conversation.organizationId !== orgId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "You are not authorized to access this conversation"
+            })
+        }
 
+        //TODO: Subscription
+        await saveMessage(ctx, components.agent, {
+            threadId: conversation.threadId,
+            agentName: identity.familyName,
+            message: {
+                role: "assistant",
+                content: args.prompt
+            }
+        })
     }
 })
 
