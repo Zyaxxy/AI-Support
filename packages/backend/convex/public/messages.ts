@@ -5,6 +5,9 @@ import { SupportAgent } from "../../convex/system/aiAgents/supportAgent";
 import { paginationOptsValidator } from "convex/server";
 import { resolveConversation } from "../system/aiAgents/tools/resolveConversation";
 import { escalateConversation } from "../system/aiAgents/tools/escalateConversation";
+import { components } from "../_generated/api";
+import { saveMessage } from "@convex-dev/agent";
+
 
 export const create = action({
     args: {
@@ -45,16 +48,24 @@ export const create = action({
                 message: "Conversation resolved"
             })
         }
-
+        const shouldTriggerAgent = conversation.status === "unresolved";
         //TODO: Subscription
-        await SupportAgent.generateText(ctx, { threadId: args.threadId }, {
-            prompt: args.prompt,
-            tools: {
-                resolveConversation,
-                escalateConversation,
-            },
-        })
-
+        if (shouldTriggerAgent) {
+            await SupportAgent.generateText(ctx, { threadId: args.threadId }, {
+                prompt: args.prompt,
+                tools: {
+                    resolveConversation,
+                    escalateConversation,
+                },
+            })
+        }
+        else {
+            await saveMessage(ctx, components.agent,
+                {
+                    threadId: args.threadId,
+                    prompt: args.prompt,
+                });
+        }
     }
 })
 

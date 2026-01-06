@@ -4,7 +4,7 @@ interface UseInfiniteScrollProps {
     status: "CanLoadMore" | "LoadingMore" | "Exhausted" | "LoadingFirstPage";
     loadmore: (numItems: number) => void;
     loadSize?: number;
-    observerEnabled: boolean;
+    observerEnabled?: boolean;
 };
 
 export const useInfiniteScroll = ({

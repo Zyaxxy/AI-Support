@@ -4,7 +4,7 @@ import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
 import { useQuery, useMutation } from "convex/react";
-import { MoreHorizontal, MoreHorizontalIcon, Wand2Icon } from "lucide-react";
+import { MoreHorizontalIcon, Wand2Icon } from "lucide-react";
 import {
     AIConversation,
     AIConversationContent,
@@ -33,7 +33,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { ConversationStatusButton } from "../components/conversation-status-button";
-import { set } from "date-fns";
+import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
+import { InfiniteScrollTrigger } from "@workspace/ui/components/infinitescrolltrigger";
 const formSchema = z.object({
     message: z.string().min(1, "Message is required"),
 });
@@ -42,6 +43,19 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
     const messages = useThreadMessages(api.private.messages.getMany, conversation?.threadId ? { threadId: conversation.threadId } : "skip",
         { initialNumItems: 10, }
     );
+
+    const { topElementRef,
+        handleLoadMore,
+        canLoadMore,
+        isLoadingMore,
+    } = useInfiniteScroll(
+        {
+            status: messages.status,
+            loadmore: messages.loadMore,
+            loadSize: 10,
+            observerEnabled: true,
+        });
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -100,6 +114,11 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
             </div>
             <AIConversation className="flex-1 overflow-hidden">
                 <AIConversationContent>
+                    <InfiniteScrollTrigger
+                        ref={topElementRef}
+                        isLoadingMore={isLoadingMore}
+                        canLoadMore={canLoadMore}
+                        onLoadMore={handleLoadMore} />
                     {toUIMessages(messages.results ?? [])?.map((message) => (
                         <AIMessage from={message.role === "user" ? "assistant" : "user"}
                             key={message.id}>
