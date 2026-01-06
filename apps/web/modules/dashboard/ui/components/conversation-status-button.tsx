@@ -3,14 +3,15 @@ import { Button } from "@workspace/ui/components/button";
 import { Hint } from "@workspace/ui/components/hint";
 import {  ArrowRightIcon, ArrowUpIcon, CheckIcon } from "lucide-react";
 
-export const ConversationStatusButton = ({status, onClick}: {
+export const ConversationStatusButton = ({status, onClick,disabled,}: {
     status: Doc<"conversations">["status"];
-    onClick: () => void;
+    onClick: () => void; 
+    disabled: boolean;  
 }) => {
     if (status === "unresolved") {
         return (
             <Hint text="Mark as unresolved">
-                <Button onClick={onClick} variant="tertiary" size="sm">
+                <Button disabled={disabled} onClick={onClick} variant="tertiary" size="sm">
                     <CheckIcon />
                     Resolved
                 </Button>
@@ -20,7 +21,7 @@ export const ConversationStatusButton = ({status, onClick}: {
     if (status === "escalated") {
         return (
             <Hint text="Mark as Resolved">
-                <Button onClick={onClick} variant='warning' size="sm">
+                <Button disabled={disabled} onClick={onClick} variant='warning' size="sm">
                     <ArrowUpIcon/>
                     Escalated
                 </Button>
@@ -29,7 +30,7 @@ export const ConversationStatusButton = ({status, onClick}: {
     }
     return (
         <Hint text="Mark as Escalated">
-            <Button onClick={onClick} variant="destructive" size="sm">
+            <Button disabled={disabled} onClick={onClick} variant="destructive" size="sm">
                 <ArrowRightIcon />
                 Unresolved
             </Button>

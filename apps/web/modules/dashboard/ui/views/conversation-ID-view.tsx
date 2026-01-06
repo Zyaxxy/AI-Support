@@ -1,4 +1,5 @@
 "use client"
+import { useState } from "react";
 import { api } from "@workspace/backend/_generated/api";
 import { Id } from "@workspace/backend/_generated/dataModel";
 import { Button } from "@workspace/ui/components/button";
@@ -32,6 +33,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
 import { ConversationStatusButton } from "../components/conversation-status-button";
+import { set } from "date-fns";
 const formSchema = z.object({
     message: z.string().min(1, "Message is required"),
 });
@@ -58,10 +60,13 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
             console.error(error);
         }
     };
+    const [IsUpdatingStatus, SetIsUpdatingStatus] = useState(false);
 
     const UpdateConversationStatus = useMutation(api.private.conversation.updateStatus);
     const handleToggleStatus = async () => {
         if(!conversation) return;
+        SetIsUpdatingStatus(true);
+
         let newStatus: "unresolved" | "escalated" | "resolved";
         if(conversation.status === "unresolved") {
             newStatus = "escalated";
@@ -78,6 +83,8 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
             });
         } catch (error) {
             console.error(error);
+        }finally{
+            SetIsUpdatingStatus(false);
         }
     };
 
@@ -87,7 +94,7 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
                 <Button size="sm" variant="ghost">
                     <MoreHorizontalIcon />
                 </Button>
-                <ConversationStatusButton status={conversation?.status ?? "unresolved"} onClick={handleToggleStatus} />
+                <ConversationStatusButton disabled={IsUpdatingStatus} status={conversation?.status ?? "unresolved"} onClick={handleToggleStatus} />
             </div>
             <AIConversation className="max-h-[calc(100vh-192px)]">
                 <AIConversationContent>
