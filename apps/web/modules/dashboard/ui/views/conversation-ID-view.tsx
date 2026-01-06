@@ -31,6 +31,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
+import { ConversationStatusButton } from "../components/conversation-status-button";
 const formSchema = z.object({
     message: z.string().min(1, "Message is required"),
 });
@@ -58,6 +59,28 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
         }
     };
 
+    const UpdateConversationStatus = useMutation(api.private.conversation.updateStatus);
+    const handleToggleStatus = async () => {
+        if(!conversation) return;
+        let newStatus: "unresolved" | "escalated" | "resolved";
+        if(conversation.status === "unresolved") {
+            newStatus = "escalated";
+        } else if(conversation.status === "escalated") {
+            newStatus = "resolved";
+        } else {
+            newStatus = "unresolved";
+        }
+         
+        try {
+            await UpdateConversationStatus({
+                conversationId,
+                status: newStatus
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3.5">
             <div className="flex items-center justify-between gap-3">
@@ -65,10 +88,11 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
                     variant="ghost">
                     <MoreHorizontalIcon />
                 </Button>
+                <ConversationStatusButton status={conversation?.status ?? "unresolved"} onClick={handleToggleStatus} />
             </div>
             <AIConversation className="max-h-[calc(100vh-192px)]">
                 <AIConversationContent>
-                    {toUIMessages(messages.results ?? [])?.map((message) => (
+                    {toUIMessages(messages.results ?? [])?.map((message) => (   
                         <AIMessage from={message.role === "user" ? "assistant" : "user"}
                             key={message.id}>
                             <AIMessageContent>
