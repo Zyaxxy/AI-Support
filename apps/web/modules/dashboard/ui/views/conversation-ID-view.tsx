@@ -84,8 +84,7 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
     return (
         <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3.5">
             <div className="flex items-center justify-between gap-3">
-                <Button size="sm"
-                    variant="ghost">
+                <Button size="sm" variant="ghost">
                     <MoreHorizontalIcon />
                 </Button>
                 <ConversationStatusButton status={conversation?.status ?? "unresolved"} onClick={handleToggleStatus} />
