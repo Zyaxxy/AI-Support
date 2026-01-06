@@ -4,7 +4,7 @@ import { ConversationIdView } from "@/modules/dashboard/ui/views/conversation-ID
 const Page = async ({ params }: { params: Promise<{ conversationId: string }> }) => {
     const { conversationId } = await params;
     return (
-        <div>
+        <div className="h-full">
             <ConversationIdView conversationId={conversationId as Id<"conversations">} />
         </div>
     );

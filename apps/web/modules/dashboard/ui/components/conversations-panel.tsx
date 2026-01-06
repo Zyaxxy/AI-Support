@@ -50,7 +50,7 @@ export const ConversationsPanel = () => {
                     <Select defaultValue="all"
                         onValueChange={(value) => setStatusFilter(value as typeof statusFilter)}
                         value={statusFilter}>
-                        <SelectTrigger className="h-8 w-[130px] border-border/50 bg-background/50 px-3 text-xs shadow-sm hover:bg-accent/50 hover:border-primary/30 transition-all duration-200">
+                        <SelectTrigger className="h-8 w-[135px] border-border/50 bg-background/50 px-3 text-xs shadow-sm hover:bg-accent/50 hover:border-primary/30 transition-all duration-200">
                             <SelectValue placeholder="Filter" />
                         </SelectTrigger>
                         <SelectContent className="min-w-[150px]">

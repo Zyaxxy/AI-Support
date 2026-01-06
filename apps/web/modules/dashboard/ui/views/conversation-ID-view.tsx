@@ -64,18 +64,18 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
 
     const UpdateConversationStatus = useMutation(api.private.conversation.updateStatus);
     const handleToggleStatus = async () => {
-        if(!conversation) return;
+        if (!conversation) return;
         SetIsUpdatingStatus(true);
 
         let newStatus: "unresolved" | "escalated" | "resolved";
-        if(conversation.status === "unresolved") {
+        if (conversation.status === "unresolved") {
             newStatus = "escalated";
-        } else if(conversation.status === "escalated") {
+        } else if (conversation.status === "escalated") {
             newStatus = "resolved";
         } else {
             newStatus = "unresolved";
         }
-         
+
         try {
             await UpdateConversationStatus({
                 conversationId,
@@ -83,22 +83,24 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
             });
         } catch (error) {
             console.error(error);
-        }finally{
+        } finally {
             SetIsUpdatingStatus(false);
         }
     };
 
     return (
-        <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3.5">
-            <div className="flex items-center justify-between gap-3">
-                <Button size="sm" variant="ghost">
-                    <MoreHorizontalIcon />
-                </Button>
-                <ConversationStatusButton disabled={IsUpdatingStatus} status={conversation?.status ?? "unresolved"} onClick={handleToggleStatus} />
+        <div className="flex flex-col h-full">
+            <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3.5">
+                <div className="flex items-center justify-between gap-3">
+                    <Button size="sm" variant="ghost">
+                        <MoreHorizontalIcon />
+                    </Button>
+                    <ConversationStatusButton disabled={IsUpdatingStatus} status={conversation?.status ?? "unresolved"} onClick={handleToggleStatus} />
+                </div>
             </div>
-            <AIConversation className="max-h-[calc(100vh-192px)]">
+            <AIConversation className="flex-1 overflow-hidden">
                 <AIConversationContent>
-                    {toUIMessages(messages.results ?? [])?.map((message) => (   
+                    {toUIMessages(messages.results ?? [])?.map((message) => (
                         <AIMessage from={message.role === "user" ? "assistant" : "user"}
                             key={message.id}>
                             <AIMessageContent>
@@ -137,7 +139,7 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
                         />
                         <AIInputToolbar>
                             <AIInputTools>
-                                <AIInputButton>
+                                <AIInputButton disabled={conversation?.status === "resolved" || form.formState.isSubmitting}>
                                     <Wand2Icon />
                                     Enhance
                                 </AIInputButton>

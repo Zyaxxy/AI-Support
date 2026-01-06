@@ -15,6 +15,8 @@ import type * as public_conversations from "../public/conversations.js";
 import type * as public_messages from "../public/messages.js";
 import type * as public_organizations from "../public/organizations.js";
 import type * as system_aiAgents_supportAgent from "../system/aiAgents/supportAgent.js";
+import type * as system_aiAgents_tools_escalateConversation from "../system/aiAgents/tools/escalateConversation.js";
+import type * as system_aiAgents_tools_resolveConversation from "../system/aiAgents/tools/resolveConversation.js";
 import type * as system_contactSessions from "../system/contactSessions.js";
 import type * as system_coversations from "../system/coversations.js";
 import type * as users from "../users.js";
@@ -41,6 +43,8 @@ declare const fullApi: ApiFromModules<{
   "public/messages": typeof public_messages;
   "public/organizations": typeof public_organizations;
   "system/aiAgents/supportAgent": typeof system_aiAgents_supportAgent;
+  "system/aiAgents/tools/escalateConversation": typeof system_aiAgents_tools_escalateConversation;
+  "system/aiAgents/tools/resolveConversation": typeof system_aiAgents_tools_resolveConversation;
   "system/contactSessions": typeof system_contactSessions;
   "system/coversations": typeof system_coversations;
   users: typeof users;

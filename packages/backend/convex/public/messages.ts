@@ -3,6 +3,8 @@ import { ConvexError, v } from "convex/values";
 import { internal } from "../_generated/api";
 import { SupportAgent } from "../../convex/system/aiAgents/supportAgent";
 import { paginationOptsValidator } from "convex/server";
+import { resolveConversation } from "../system/aiAgents/tools/resolveConversation";
+import { escalateConversation } from "../system/aiAgents/tools/escalateConversation";
 
 export const create = action({
     args: {
@@ -47,6 +49,10 @@ export const create = action({
         //TODO: Subscription
         await SupportAgent.generateText(ctx, { threadId: args.threadId }, {
             prompt: args.prompt,
+            tools: {
+                resolveConversation,
+                escalateConversation,
+            },
         })
 
     }
