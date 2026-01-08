@@ -88,7 +88,11 @@ export const create = mutation({
                 message: "You are not authorized to access this conversation"
             })
         }
-
+        if (conversation.status === "unresolved") {
+            await ctx.db.patch(args.conversationId, {
+                status: "escalated"
+            })
+        }
         //TODO: Subscription
         await saveMessage(ctx, components.agent, {
             threadId: conversation.threadId,
