@@ -1,15 +1,16 @@
 import { action } from "../_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
-import { guessMimeTypeFromContents, guessMimeTypeFromExtension } from "@convex-dev/rag";
+import { contentHashFromArrayBuffer, guessMimeTypeFromContents, guessMimeTypeFromExtension } from "@convex-dev/rag";
+import { extractTextContent } from "../lib/extractTextContent";
+import rag from "../system/aiAgents/rag";
 
-
-const guessMimeType = (fileName: string, bytes: ArrayBuffer): string => {
-    return guessMimeTypeFromExtension(fileName) || guessMimeTypeFromContents(bytes) || "application/octet-stream";
+const guessMimeType = (filename: string, bytes: ArrayBuffer): string => {
+    return guessMimeTypeFromExtension(filename) || guessMimeTypeFromContents(bytes) || "application/octet-stream";
 }
 export const addFile = action({
     args: {
-        fileName: v.string(),
+        filename: v.string(),
         mimeType: v.string(),
         bytes: v.bytes(),
         category: v.optional(v.string()),
@@ -32,16 +33,43 @@ export const addFile = action({
             })
         }
 
-        const { bytes, fileName, category } = args;
-        const mimeType = args.mimeType || guessMimeType(fileName, bytes);
+        const { bytes, filename, category } = args;
+        const mimeType = args.mimeType || guessMimeType(filename, bytes);
         const blob = new Blob([bytes], { type: mimeType });
         const storageId = await ctx.storage.store(blob);
 
         const text = await extractTextContent(ctx, {
             storageId,
             mimeType,
-            fileName,
-            category
+            filename,
+            bytes,
         })
+
+
+        const { entryId, created } = await rag.add(ctx, {
+            //SUPER IMPORTANT
+            namespace: orgId,
+            text,
+            key: filename,
+            title: filename,
+            metadata: {
+                storageId,
+                uploadedBy: orgId,
+                mimeType,
+                filename,
+                category: category || null,
+            },
+            contentHash: await contentHashFromArrayBuffer(bytes),
+        });
+        if (!created) {
+            console.debug("File already exist, skipping metadata update")
+            await ctx.storage.delete(storageId);
+        }
+
+        return {
+            url: await ctx.storage.getUrl(storageId),
+            entryId,
+            created
+        }
     }
 })

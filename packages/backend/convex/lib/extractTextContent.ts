@@ -21,25 +21,52 @@ const SYSTEM_PROMPT = {
 
 export type ExtractTextContentArgs = {
     storageId: Id<"_storage">;
-    fileName: string;
+    filename: string;
     mimeType: string;
     bytes?: ArrayBuffer;
 }
 
 export async function extractTextContent(ctx: { storage: StorageActionWriter }, args: ExtractTextContentArgs): Promise<string> {
-    const { storageId, fileName, mimeType, bytes } = args;
+    const { storageId, filename, mimeType, bytes } = args;
     const url = await ctx.storage.getUrl(storageId);
     assert(url, "Storage URL not found");
     if (SUPPORT_IMAGE_TYPES.some((type) => type === mimeType)) {
         return extractImageText(url);
     }
     if (mimeType.toLowerCase().includes("pdf")) {
-        return extractPdfText(url, fileName, mimeType);
+        return extractPdfText(url, filename, mimeType);
     }
-    if (mimeType.toLowerCase().includes("html")) {
-        return extractHtmlText(url);
+    if (mimeType.toLowerCase().includes("text")) {
+        return extractTextFileContent(ctx, storageId, bytes, mimeType);
     }
-    return "";
+    throw new Error("Unsupported MIME type:" + mimeType);
+}
+
+async function extractTextFileContent(ctx: { storage: StorageActionWriter },
+    storageId: Id<"_storage">, bytes: ArrayBuffer | undefined, mimeType: string): Promise<string> {
+    const arrayBuffer = bytes || (await (await ctx.storage.get(storageId))?.arrayBuffer());
+    if (!arrayBuffer) {
+        throw new Error("ArrayBuffer not found");
+    }
+    const text = new TextDecoder().decode(arrayBuffer);
+    if (mimeType.toLocaleLowerCase() !== "text/plain") {
+        const result = await generateText({
+            model: AI_MODEL.html,
+            system: SYSTEM_PROMPT.html,
+            messages: [
+                {
+                    role: "user",
+                    content: [{ type: "text", text },
+                    {
+                        type: "text",
+                        text: "Extract the text content from the file and print it in markdown format without any additional information."
+                    }],
+                },
+            ],
+        })
+        return result.text;
+    }
+    return text;
 }
 
 async function extractImageText(url: string): Promise<string> {
@@ -56,7 +83,7 @@ async function extractImageText(url: string): Promise<string> {
     return result.text;
 }
 
-async function extractPdfText(url: string, fileName: string, mimeType: string): Promise<string> {
+async function extractPdfText(url: string, filename: string, mimeType: string): Promise<string> {
     const result = await generateText({
         model: AI_MODEL.pdf,
         system: SYSTEM_PROMPT.pdf,
@@ -66,8 +93,8 @@ async function extractPdfText(url: string, fileName: string, mimeType: string): 
                 content: [{
                     type: "file",
                     data: new URL(url),
-                    fileName,
-                    mimeType,
+                    filename: filename,
+                    mediaType: mimeType,
                 }, {
                     type: "text",
                     text: "Extract the text content from the PDF file and return it without any additional information.",
