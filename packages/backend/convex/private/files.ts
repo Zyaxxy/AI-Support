@@ -1,13 +1,54 @@
-import { action } from "../_generated/server";
+import { action, mutation } from "../_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
-import { contentHashFromArrayBuffer, guessMimeTypeFromContents, guessMimeTypeFromExtension } from "@convex-dev/rag";
+import { contentHashFromArrayBuffer, guessMimeTypeFromContents, guessMimeTypeFromExtension, vEntryId } from "@convex-dev/rag";
 import { extractTextContent } from "../lib/extractTextContent";
 import rag from "../system/aiAgents/rag";
+import { Id } from "../_generated/dataModel";
 
 const guessMimeType = (filename: string, bytes: ArrayBuffer): string => {
     return guessMimeTypeFromExtension(filename) || guessMimeTypeFromContents(bytes) || "application/octet-stream";
 }
+export const deleteFile = mutation({
+    args: {
+        entryId: vEntryId,
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (identity === null) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Identity not found"
+            })
+        }
+        const orgId = identity.orgId as string;
+
+        if (!orgId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Organization not found"
+            })
+        }
+
+        const entry = await rag.getEntry(ctx, { entryId: args.entryId });
+        if (!entry) {
+            throw new ConvexError({
+                code: "NOT_FOUND",
+                message: "Entry not found"
+            })
+        }
+        if (entry.metadata?.uploadedBy !== orgId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Invalid organization"
+            })
+        }
+        if (entry.metadata?.storageId) {
+            await ctx.storage.delete(entry.metadata.storageId as Id<"_storage">);
+        }
+        await rag.delete(ctx, { entryId: args.entryId });
+    }
+})
 export const addFile = action({
     args: {
         filename: v.string(),
