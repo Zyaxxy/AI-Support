@@ -140,7 +140,7 @@ export const listfiles = query({
 
         const namespace = await rag.getNamespace(ctx, { namespace: orgId });
         if (!namespace) {
-            return { pages: [], isDone: true, continueCursor: null }
+            return { page: [], isDone: true, continueCursor: "" }
         }
         const results = await rag.list(ctx, {
             namespaceId: namespace.namespaceId,
@@ -150,11 +150,11 @@ export const listfiles = query({
             return convertEntryToPublicFile(ctx, entry)
         }))
 
-        const filteredFiles = args.category ? files.filter((files) => files.category === args.category) : files;
+        const filteredFiles = args.category ? files.filter((file) => file.category === args.category) : files;
         return {
-            pages: filteredFiles,
+            page: filteredFiles,
             isDone: results.isDone,
-            continueCursor: results.continueCursor
+            continueCursor: results.continueCursor ?? ""
         }
     }
 })
