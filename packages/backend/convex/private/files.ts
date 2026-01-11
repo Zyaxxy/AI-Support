@@ -147,8 +147,15 @@ export const listfiles = query({
             paginationOpts: args.paginationOpts
         })
         const files = await Promise.all(results.page.map((entry) => {
-            convertEntryToPublicFile(ctx, entry)
+            return convertEntryToPublicFile(ctx, entry)
         }))
+
+        const filteredFiles = args.category ? files.filter((files) => files.category === args.category) : files;
+        return {
+            pages: filteredFiles,
+            isDone: results.isDone,
+            continueCursor: results.continueCursor
+        }
     }
 })
 
@@ -159,7 +166,7 @@ export type PublicFile = {
     size: string,
     status: "ready" | "processing" | "error",
     url: string | null,
-    catergory?: string,
+    category?: string,
 
 }
 type EntryMetadata = {
@@ -201,7 +208,7 @@ async function convertEntryToPublicFile(ctx: QueryCtx, entry: Entry):
         size: fileSize,
         status,
         url,
-        catergory: metadata?.category || undefined,
+        category: metadata?.category || undefined,
     }
 }
 
