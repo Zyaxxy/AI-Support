@@ -1,10 +1,12 @@
-import { action, mutation } from "../_generated/server";
+import { action, mutation, query, QueryCtx } from "../_generated/server";
 import { v } from "convex/values";
 import { ConvexError } from "convex/values";
-import { contentHashFromArrayBuffer, guessMimeTypeFromContents, guessMimeTypeFromExtension, vEntryId } from "@convex-dev/rag";
+import { contentHashFromArrayBuffer, EntryId, guessMimeTypeFromContents, guessMimeTypeFromExtension, vEntryId } from "@convex-dev/rag";
 import { extractTextContent } from "../lib/extractTextContent";
 import rag from "../system/aiAgents/rag";
 import { Id } from "../_generated/dataModel";
+import { paginationOptsValidator } from "convex/server";
+import { Entry } from "@convex-dev/rag";
 
 const guessMimeType = (filename: string, bytes: ArrayBuffer): string => {
     return guessMimeTypeFromExtension(filename) || guessMimeTypeFromContents(bytes) || "application/octet-stream";
@@ -96,10 +98,9 @@ export const addFile = action({
             metadata: {
                 storageId,
                 uploadedBy: orgId,
-                mimeType,
                 filename,
-                category: category || null,
-            },
+                category: category ?? null,
+            } as EntryMetadata,
             contentHash: await contentHashFromArrayBuffer(bytes),
         });
         if (!created) {
@@ -114,3 +115,99 @@ export const addFile = action({
         }
     }
 })
+
+export const listfiles = query({
+    args: {
+        category: v.optional(v.string()),
+        paginationOpts: paginationOptsValidator
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (identity === null) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Identity not found"
+            })
+        }
+        const orgId = identity.orgId as string;
+
+        if (!orgId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Organization not found"
+            })
+        }
+
+        const namespace = await rag.getNamespace(ctx, { namespace: orgId });
+        if (!namespace) {
+            return { pages: [], isDone: true, continueCursor: null }
+        }
+        const results = await rag.list(ctx, {
+            namespaceId: namespace.namespaceId,
+            paginationOpts: args.paginationOpts
+        })
+        const files = await Promise.all(results.page.map((entry) => {
+            convertEntryToPublicFile(ctx, entry)
+        }))
+    }
+})
+
+export type PublicFile = {
+    id: EntryId,
+    name: string,
+    type: string,
+    size: string,
+    status: "ready" | "processing" | "error",
+    url: string | null,
+    catergory?: string,
+
+}
+type EntryMetadata = {
+    storageId: Id<"_storage">,
+    uploadedBy: string,
+    filename: string,
+    category: string | null,
+}
+
+async function convertEntryToPublicFile(ctx: QueryCtx, entry: Entry):
+    Promise<PublicFile> {
+    const metadata = entry.metadata as EntryMetadata;
+
+    const storageId = metadata?.storageId;
+    let fileSize = "";
+    if (storageId) {
+        try {
+            const storageMetadata = await ctx.db.system.get(storageId);
+            if (storageMetadata) {
+                fileSize = formatFileSize(storageMetadata.size);
+            }
+        } catch (error) {
+            console.error("Failed to get file size", error);
+        }
+    }
+    const filename = entry.key || "Unknown";
+    const extension = filename.split(".").pop() || "";
+    let status: "ready" | "processing" | "error" = "error";
+    if (entry.status === "ready") {
+        status = "ready";
+    } else if (entry.status === "pending") {
+        status = "processing";
+    }
+    const url = storageId ? await ctx.storage.getUrl(storageId) : null;
+    return {
+        id: entry.entryId,
+        name: filename,
+        type: extension,
+        size: fileSize,
+        status,
+        url,
+        catergory: metadata?.category || undefined,
+    }
+}
+
+export function formatFileSize(bytes: number): string {
+    const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    if (bytes === 0) return "0 Bytes";
+    const i = parseInt(String(Math.floor(Math.log(bytes) / Math.log(1024))));
+    return Math.round(bytes / Math.pow(1024, i)) + " " + sizes[i];
+}
