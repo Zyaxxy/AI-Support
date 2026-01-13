@@ -14,6 +14,7 @@ import { usePaginatedQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 import type { PublicFile } from "@workspace/backend/private/files";
 import { Button } from "@workspace/ui/components/button";
+import { Badge } from "@workspace/ui/components/badge";
 export const FilesView = () => {
     const files = usePaginatedQuery(
         api.private.files.listfiles,
@@ -90,14 +91,13 @@ export const FilesView = () => {
                                                 <span>{file.type}</span>
                                             </div>
                                         </TableCell>
-                                        <TableCell className="px-6 py-4 font-medium">
-                                            <div className="flex items-center gap-3">
-                                                <FileIcon className="mr-2 h-4 w-4" />
-                                                <span>{file.size}</span>
-                                            </div>
+                                        <TableCell className="px-6 py-4 text-muted-foreground">
+                                            <Badge className="uppercase" variant="outline">
+                                                {file.size}
+                                            </Badge>
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
-                                            <Button onClick={() => { }}><Trash2Icon className="mr-2 h-4 w-4" /> Delete</Button>
+
                                         </TableCell>
                                     </TableRow>
                                 ))
