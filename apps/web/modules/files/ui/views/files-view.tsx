@@ -1,5 +1,11 @@
 "use client";
 import {
+    DropdownMenu,
+    DropdownMenuItem,
+    DropdownMenuContent,
+    DropdownMenuTrigger,
+} from "@workspace/ui/components/dropdown-menu"
+import {
     Table,
     TableBody,
     TableCell,
@@ -7,7 +13,7 @@ import {
     TableHeader,
     TableRow,
 } from "@workspace/ui/components/table"
-import { FileIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { FileIcon, MoreHorizontalIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import { useInfiniteScroll } from "@workspace/ui/hooks/use-infinite-scroll";
 import { InfiniteScrollTrigger } from "@workspace/ui/components/infinitescrolltrigger";
 import { usePaginatedQuery } from "convex/react";
@@ -86,24 +92,42 @@ export const FilesView = () => {
                                             </div>
                                         </TableCell>
                                         <TableCell className="px-6 py-4 font-medium">
-                                            <div className="flex items-center gap-3">
-                                                <FileIcon className="mr-2 h-4 w-4" />
-                                                <span>{file.type}</span>
-                                            </div>
-                                        </TableCell>
-                                        <TableCell className="px-6 py-4 text-muted-foreground">
                                             <Badge className="uppercase" variant="outline">
-                                                {file.size}
+                                                {file.type}
                                             </Badge>
                                         </TableCell>
+                                        <TableCell className="px-6 py-4 text-muted-foreground">
+                                            {file.size}
+                                        </TableCell>
                                         <TableCell className="px-6 py-4">
-
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger>
+                                                    <Button className="size-8 p-0" variant="ghost" size="sm">
+                                                        <MoreHorizontalIcon />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="end">
+                                                    <DropdownMenuItem className="text-destructive"
+                                                        onClick={() => { }}>
+                                                        <Trash2Icon className="mr-2 size-4" />
+                                                        Delete
+                                                    </DropdownMenuItem>
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </TableCell>
                                     </TableRow>
                                 ))
                             })()}
                         </TableBody>
                     </Table>
+                    {!isLoadingFirstPage && files.results.length > 0 && (
+                        <InfiniteScrollTrigger
+                            ref={topElementRef}
+                            canLoadMore={canLoadMore}
+                            isLoadingMore={isLoadingMore}
+                            onLoadMore={handleLoadMore}
+                        />
+                    )}
                 </div>
             </div>
         </div>
