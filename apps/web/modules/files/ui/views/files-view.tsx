@@ -21,6 +21,8 @@ import { api } from "@workspace/backend/_generated/api";
 import type { PublicFile } from "@workspace/backend/private/files";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
+import { UploadDialog } from "../components/upload-dialog";
+import { useState } from "react";
 export const FilesView = () => {
     const files = usePaginatedQuery(
         api.private.files.listfiles,
@@ -40,7 +42,10 @@ export const FilesView = () => {
         loadmore: files.loadMore,
         loadSize: 10,
     })
+    const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
     return (
+        <>
+        <UploadDialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen} />
         <div className="flex min-h-screen flex-col bg-muted p-8">
             <div className="mx-auto w-full max-w-screen-md">
                 <div className="space-y-2">
@@ -51,7 +56,7 @@ export const FilesView = () => {
                 </div>
                 <div className="mt-8 rounded-lg border bg-background">
                     <div className="flex items-center justify-end border-b px-6 py-4">
-                        <Button onClick={() => { }}><PlusIcon className="mr-2 h-4 w-4" /> Add New File</Button>
+                        <Button onClick={() => { setUploadDialogOpen(true) }}><PlusIcon className="mr-2 h-4 w-4" /> Add New File</Button>
                     </div>
                     <Table>
                         <TableHeader>
@@ -131,5 +136,6 @@ export const FilesView = () => {
                 </div>
             </div>
         </div>
+        </>
     );
 }
