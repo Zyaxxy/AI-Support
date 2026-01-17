@@ -23,6 +23,7 @@ import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { UploadDialog } from "../components/upload-dialog";
 import { useState } from "react";
+import { DeleteFileDialog } from "../components/delete-file-dialog";
 export const FilesView = () => {
     const files = usePaginatedQuery(
         api.private.files.listfiles,
@@ -43,8 +44,18 @@ export const FilesView = () => {
         loadSize: 10,
     })
     const [uploadDialogOpen, setUploadDialogOpen] = useState(false);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<PublicFile | null>(null);
+    const handleDeleteClick = (file: PublicFile) => {
+        setSelectedFile(file);
+        setDeleteDialogOpen(true);
+    }
+    const handleFileDeleted = () => {
+        setSelectedFile(null);
+    }
     return (
         <>
+        <DeleteFileDialog file={selectedFile} open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} onDeleted={handleFileDeleted} />
         <UploadDialog open={uploadDialogOpen} onOpenChange={setUploadDialogOpen} />
         <div className="flex min-h-screen flex-col bg-muted p-8">
             <div className="mx-auto w-full max-w-screen-md">
@@ -113,7 +124,7 @@ export const FilesView = () => {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end">
                                                     <DropdownMenuItem className="text-destructive"
-                                                        onClick={() => { }}>
+                                                        onClick={() => { handleDeleteClick(file) }}>
                                                         <Trash2Icon className="mr-2 size-4" />
                                                         Delete
                                                     </DropdownMenuItem>
