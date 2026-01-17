@@ -106,7 +106,7 @@ export const FilesView = () => {
                                         </TableCell>
                                         <TableCell className="px-6 py-4">
                                             <DropdownMenu>
-                                                <DropdownMenuTrigger>
+                                                <DropdownMenuTrigger asChild>
                                                     <Button className="size-8 p-0" variant="ghost" size="sm">
                                                         <MoreHorizontalIcon />
                                                     </Button>
