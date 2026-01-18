@@ -7,6 +7,7 @@ import { resolveConversation } from "../system/aiAgents/tools/resolveConversatio
 import { escalateConversation } from "../system/aiAgents/tools/escalateConversation";
 import { components } from "../_generated/api";
 import { saveMessage } from "@convex-dev/agent";
+import { searchTool } from "../system/aiAgents/tools/search";
 
 
 export const create = action({
@@ -56,6 +57,7 @@ export const create = action({
                 tools: {
                     resolveConversation,
                     escalateConversation,
+                    searchTool,
                 },
             })
         }
