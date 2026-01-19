@@ -20,6 +20,7 @@ import type * as system_aiAgents_rag from "../system/aiAgents/rag.js";
 import type * as system_aiAgents_supportAgent from "../system/aiAgents/supportAgent.js";
 import type * as system_aiAgents_tools_escalateConversation from "../system/aiAgents/tools/escalateConversation.js";
 import type * as system_aiAgents_tools_resolveConversation from "../system/aiAgents/tools/resolveConversation.js";
+import type * as system_aiAgents_tools_search from "../system/aiAgents/tools/search.js";
 import type * as system_contactSessions from "../system/contactSessions.js";
 import type * as system_coversations from "../system/coversations.js";
 import type * as users from "../users.js";
@@ -51,6 +52,7 @@ declare const fullApi: ApiFromModules<{
   "system/aiAgents/supportAgent": typeof system_aiAgents_supportAgent;
   "system/aiAgents/tools/escalateConversation": typeof system_aiAgents_tools_escalateConversation;
   "system/aiAgents/tools/resolveConversation": typeof system_aiAgents_tools_resolveConversation;
+  "system/aiAgents/tools/search": typeof system_aiAgents_tools_search;
   "system/contactSessions": typeof system_contactSessions;
   "system/coversations": typeof system_coversations;
   users: typeof users;
