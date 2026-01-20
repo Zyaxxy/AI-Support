@@ -196,41 +196,7 @@ export const FilesView = () => {
                             <span className="sm:hidden">Upload</span>
                         </Button>
                     </div>
-
-                    {/* Stats Cards */}
-                    <div className="grid gap-4 md:grid-cols-3">
-                        <div className="rounded-lg border bg-gradient-to-br from-background to-muted/20 p-4 shadow-sm backdrop-blur-sm">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Total Files</p>
-                                    <p className="text-2xl font-bold">{files.results?.length || 0}</p>
-                                </div>
-                                <FileIcon className="h-8 w-8 text-primary/50" />
-                            </div>
-                        </div>
-                        <div className="rounded-lg border bg-gradient-to-br from-background to-muted/20 p-4 shadow-sm backdrop-blur-sm">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Categories</p>
-                                    <p className="text-2xl font-bold">{categories.length}</p>
-                                </div>
-                                <FilterIcon className="h-8 w-8 text-primary/50" />
-                            </div>
-                        </div>
-                        <div className="rounded-lg border bg-gradient-to-br from-background to-muted/20 p-4 shadow-sm backdrop-blur-sm">
-                            <div className="flex items-center justify-between">
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Ready</p>
-                                    <p className="text-2xl font-bold">
-                                        {files.results?.filter(f => f.status === 'ready').length || 0}
-                                    </p>
-                                </div>
-                                <CheckCircle2Icon className="h-8 w-8 text-green-500/50" />
-                            </div>
-                        </div>
-                    </div>
                 </div>
-
                 {/* Search and Filter Section */}
                 <div className="mt-6 flex flex-col gap-4 sm:flex-row">
                     <div className="relative flex-1">
