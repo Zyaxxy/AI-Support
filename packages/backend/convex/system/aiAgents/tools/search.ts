@@ -5,6 +5,7 @@ import { z } from "zod/v4";
 import { internal } from "../../../_generated/api";
 import { SupportAgent } from "../supportAgent";
 import { rag } from "../rag";
+import { SEARCH_INTERPRETER_PROMPT } from "../constants";
 
 export const searchTool = createTool({
     description: "Search for information in the knowledge base",
@@ -28,7 +29,7 @@ export const searchTool = createTool({
         const response = await generateText({
             model: google("gemini-2.5-flash"),
             messages: [
-                { role: "system", content: "You interpret knowledge base search results and answer the user's query based on the context provided. " },
+                { role: "system", content: SEARCH_INTERPRETER_PROMPT  },
                 { role: "user", content: "User Asked: " + args.query + "\n\n Search Results: " + contextText },
             ],
         });
