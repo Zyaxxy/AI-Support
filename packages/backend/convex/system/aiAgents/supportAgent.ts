@@ -3,6 +3,7 @@ import { components } from "../../_generated/api";
 import { google } from '@ai-sdk/google';
 import { escalateConversation } from "./tools/escalateConversation";
 import { resolveConversation } from "./tools/resolveConversation";
+import { searchTool } from "./tools/search";
 import { SUPPORT_AGENT_PROMPT } from "./constants";
 
 export const SupportAgent = new Agent(components.agent, {
@@ -12,5 +13,6 @@ export const SupportAgent = new Agent(components.agent, {
     tools: {
         escalateConversation,
         resolveConversation,
+        searchTool,
     },
 });
