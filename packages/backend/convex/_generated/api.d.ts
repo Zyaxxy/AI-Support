@@ -9,6 +9,7 @@
  */
 
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
+import type * as playground from "../playground.js";
 import type * as private_conversation from "../private/conversation.js";
 import type * as private_files from "../private/files.js";
 import type * as private_messages from "../private/messages.js";
@@ -16,6 +17,7 @@ import type * as public_contactSessions from "../public/contactSessions.js";
 import type * as public_conversations from "../public/conversations.js";
 import type * as public_messages from "../public/messages.js";
 import type * as public_organizations from "../public/organizations.js";
+import type * as system_aiAgents_constants from "../system/aiAgents/constants.js";
 import type * as system_aiAgents_rag from "../system/aiAgents/rag.js";
 import type * as system_aiAgents_supportAgent from "../system/aiAgents/supportAgent.js";
 import type * as system_aiAgents_tools_escalateConversation from "../system/aiAgents/tools/escalateConversation.js";
@@ -41,6 +43,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   "lib/extractTextContent": typeof lib_extractTextContent;
+  playground: typeof playground;
   "private/conversation": typeof private_conversation;
   "private/files": typeof private_files;
   "private/messages": typeof private_messages;
@@ -48,6 +51,7 @@ declare const fullApi: ApiFromModules<{
   "public/conversations": typeof public_conversations;
   "public/messages": typeof public_messages;
   "public/organizations": typeof public_organizations;
+  "system/aiAgents/constants": typeof system_aiAgents_constants;
   "system/aiAgents/rag": typeof system_aiAgents_rag;
   "system/aiAgents/supportAgent": typeof system_aiAgents_supportAgent;
   "system/aiAgents/tools/escalateConversation": typeof system_aiAgents_tools_escalateConversation;
