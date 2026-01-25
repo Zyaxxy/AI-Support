@@ -35,3 +35,14 @@ export async function upsertSecretValue(secretName: string, secretValue: Record<
         }
     }
 }
+
+export function parseSecretString<T=Record<string, unknown>>(secret: GetSecretValueCommandOutput): T | null {
+    if (!secret.SecretString) {
+        return null;
+    }
+    try {
+        return JSON.parse(secret.SecretString) as T;
+    } catch {
+        return null;
+    }
+}  

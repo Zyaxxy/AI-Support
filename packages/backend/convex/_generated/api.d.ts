@@ -9,6 +9,7 @@
  */
 
 import type * as lib_extractTextContent from "../lib/extractTextContent.js";
+import type * as lib_secrets from "../lib/secrets.js";
 import type * as playground from "../playground.js";
 import type * as private_conversation from "../private/conversation.js";
 import type * as private_files from "../private/files.js";
@@ -25,6 +26,8 @@ import type * as system_aiAgents_tools_resolveConversation from "../system/aiAge
 import type * as system_aiAgents_tools_search from "../system/aiAgents/tools/search.js";
 import type * as system_contactSessions from "../system/contactSessions.js";
 import type * as system_coversations from "../system/coversations.js";
+import type * as system_plugins from "../system/plugins.js";
+import type * as system_secrets from "../system/secrets.js";
 import type * as users from "../users.js";
 
 import type {
@@ -43,6 +46,7 @@ import type {
  */
 declare const fullApi: ApiFromModules<{
   "lib/extractTextContent": typeof lib_extractTextContent;
+  "lib/secrets": typeof lib_secrets;
   playground: typeof playground;
   "private/conversation": typeof private_conversation;
   "private/files": typeof private_files;
@@ -59,6 +63,8 @@ declare const fullApi: ApiFromModules<{
   "system/aiAgents/tools/search": typeof system_aiAgents_tools_search;
   "system/contactSessions": typeof system_contactSessions;
   "system/coversations": typeof system_coversations;
+  "system/plugins": typeof system_plugins;
+  "system/secrets": typeof system_secrets;
   users: typeof users;
 }>;
 declare const fullApiWithMounts: typeof fullApi;
