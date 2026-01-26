@@ -1,8 +1,8 @@
+import VapiView from "@/modules/plugins/ui/views/vapi-view";
+
 const Page = () => {
   return (
-    <div>
-      <h1>Voice Assistant</h1>
-    </div>
+    <VapiView />
   );
 };
 
