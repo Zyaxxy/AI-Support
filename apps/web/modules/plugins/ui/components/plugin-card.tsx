@@ -47,7 +47,7 @@ export function PluginCard({ isDisabled, serviceName, serviceImage, features, on
                         <div className="relative p-3 rounded-full bg-gradient-to-br from-primary/20 to-accent/20 backdrop-blur-sm border border-primary/30 shadow-sm">
                             <ArrowLeftRightIcon className="size-5 text-primary animate-pulse" />
                         </div>
-                        <div className="h-px w-16 bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+                        <div className="h-px w-16" />
                     </div>
 
                     {/* Platform Logo */}
@@ -63,7 +63,7 @@ export function PluginCard({ isDisabled, serviceName, serviceImage, features, on
                             {/* Subtle glow effect */}
                             <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 opacity-0 transition-opacity duration-300 group-hover/platform:opacity-100" />
                         </div>
-                        <span className="text-sm font-semibold text-foreground/80">Your Platform</span>
+                        <span className="text-sm font-semibold text-foreground/80">Echo</span>
                     </div>
                 </div>
 
