@@ -5,10 +5,65 @@ import { PluginCard } from "../components/plugin-card";
 import Link from "next/link";
 import { useQuery } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
+import { useState } from "react";
+import { Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogFooter,
+    DialogTitle,
+    DialogTrigger,
+ } from "@workspace/ui/components/dialog";
+import { Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormMessage,
+ } from "@workspace/ui/components/form";
+import { Input } from "@workspace/ui/components/input";
+import { Label } from "@workspace/ui/components/label";
+import { Button } from "@workspace/ui/components/button";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useMutation } from "convex/react";
+import { toast } from "sonner";
+
+const formSchema = z.object({
+    publicAPIKey: z.string().min(1, "Public API Key is required"),
+    privateAPIKey: z.string().min(1, "Private API Key is required"),
+});
+
+const vapiPluginForm =({
+    open,
+    setOpen
+}:{
+    open:boolean;
+    setOpen: (value: boolean) => void;
+})=>{
+    const upsertSecret = useMutation(api.private.secrets.upsertSecret);
+    const form = useForm<z.infer<typeof formSchema>>({
+        resolver: zodResolver(formSchema),
+        defaultValues: {
+            publicAPIKey: "",
+            privateAPIKey: "",
+        },
+    });
+
+    const onSubmit = (values: z.infer<typeof formSchema>) => {
+        upsertSecret({
+            service: "vapi",
+            value: {publicAPIKey: values.publicAPIKey, privateAPIKey: values.privateAPIKey},
+        });
+        setOpen(false);
+    };
+}
+
 
 export default function VapiView() {
 
     const vapiPlugin = useQuery(api.private.plugins.getOne, { service: "vapi" });
+    const [connectOpen, setConnectOpen] = useState(false);
     return (
         <div className="max-h-screen bg-gradient-to-b from-background via-background to-muted/20">
             {/* Breadcrumb Navigation */}

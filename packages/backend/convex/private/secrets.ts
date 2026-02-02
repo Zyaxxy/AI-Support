@@ -1,0 +1,33 @@
+import { v,ConvexError} from "convex/values";
+import { mutation } from "../_generated/server";
+import { internal } from "../_generated/api";
+export const upsertSecret = mutation({
+    args: {
+        service: v.union(v.literal("vapi")),
+        value:v.any(),
+    },
+    handler: async (ctx, args) => {
+        const identity = await ctx.auth.getUserIdentity();
+        if (identity === null) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Identity not found"
+            })
+        }
+        const orgId = identity.orgId as string;
+        
+        if (!orgId) {
+            throw new ConvexError({
+                code: "UNAUTHORIZED",
+                message: "Organization not found"
+            })
+        }
+        
+        //Todo later: Check Subscription
+        await ctx.scheduler.runAfter(0, internal.system.secrets.upsertSecret, {
+            service: args.service,
+            value: args.value,
+            organizationId: orgId,
+        })
+    }
+})
