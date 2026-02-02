@@ -3,8 +3,12 @@
 import { MessageSquare, Phone, ChevronRight, Sparkles, Shield, Zap, PhoneCallIcon, WorkflowIcon } from "lucide-react";
 import { PluginCard } from "../components/plugin-card";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
 
 export default function VapiView() {
+
+    const vapiPlugin = useQuery(api.private.plugins.getOne, { service: "vapi" });
     return (
         <div className="max-h-screen bg-gradient-to-b from-background via-background to-muted/20">
             {/* Breadcrumb Navigation */}
@@ -39,11 +43,12 @@ export default function VapiView() {
 
                 {/* Plugin Card Section */}
                 <div className="space-y-6">
-                    <PluginCard
-                        serviceName="Vapi"
-                        serviceImage="/vapi.jpg"
-                        features={[
-                            {
+               (
+                        <PluginCard
+                            serviceName="Vapi"
+                            serviceImage="/vapi.jpg"
+                            features={[
+                                {
                                 icon: Phone,
                                 label: "Phone Numbers",
                                 description: "Get dedicated phone numbers for your application",
@@ -61,7 +66,9 @@ export default function VapiView() {
                         ]}
                         onSubmit={() => {   
                         }}
+                        isDisabled={vapiPlugin === undefined}
                     />
+                    )
                 </div>
             </div>
         </div>

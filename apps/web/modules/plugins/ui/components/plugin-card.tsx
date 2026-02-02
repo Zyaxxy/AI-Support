@@ -121,7 +121,7 @@ export function PluginCard({ isDisabled, serviceName, serviceImage, features, on
                         </span>
                     </Button>
                 </div>
-            </div>
+            </div>      
         </div>
     );
 }

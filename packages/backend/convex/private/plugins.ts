@@ -10,7 +10,7 @@ export const getOne = query({
          if (identity === null) {
             throw new ConvexError({
                 code: "UNAUTHORIZED",
-                message: "Identity not found"
+                message: "Identity not found" 
             })
         }
         const orgId = identity.orgId as string;
