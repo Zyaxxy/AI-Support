@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Phone, ChevronRight, Sparkles, Shield, Zap } from "lucide-react";
+import { MessageSquare, Phone, ChevronRight, Sparkles, Shield, Zap, PhoneCallIcon, WorkflowIcon } from "lucide-react";
 import { PluginCard } from "../components/plugin-card";
 import Link from "next/link";
 
@@ -45,14 +45,19 @@ export default function VapiView() {
                         features={[
                             {
                                 icon: Phone,
-                                label: "Voice Calls",
-                                description: "Make and receive phone calls with advanced voice recognition and natural language processing",
+                                label: "Phone Numbers",
+                                description: "Get dedicated phone numbers for your application",
                             },
                             {
-                                icon: MessageSquare,
-                                label: "SMS Messaging",
-                                description: "Send and receive SMS messages with full conversation tracking and management",
+                                icon: PhoneCallIcon,
+                                label: "Outbound Calls",
+                                description: "Automated calling to customers",
                             },
+                            {
+                                icon: WorkflowIcon,
+                                label: "Workflows",
+                                description: "Create custom conversation flows",
+                            }
                         ]}
                         onSubmit={() => {   
                         }}
