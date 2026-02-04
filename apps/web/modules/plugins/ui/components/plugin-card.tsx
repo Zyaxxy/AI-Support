@@ -114,7 +114,7 @@ export function PluginCard({ isDisabled, serviceName, serviceImage, features, on
                         className="w-full h-12 text-base font-semibold bg-gradient-to-r from-primary to-primary/90 hover:from-primary/90 hover:to-primary shadow-md hover:shadow-lg transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed group/button"
                     >
                         <span className="flex items-center gap-2">
-                            {isDisabled ? "Already Connected" : "Connect Integration"}
+                            {isDisabled ? "Already Connected" : `Connect`}
                             {!isDisabled && (
                                 <ArrowLeftRightIcon className="size-4 transition-transform duration-300 group-hover/button:scale-110" />
                             )}

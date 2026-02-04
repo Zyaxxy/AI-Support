@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageSquare, Phone, ChevronRight, Sparkles, Shield, Zap, PhoneCallIcon, WorkflowIcon } from "lucide-react";
+import { MessageSquare, Phone, ChevronRight, Sparkles, Shield, Zap, PhoneCallIcon, WorkflowIcon, LanguagesIcon } from "lucide-react";
 import { PluginCard } from "../components/plugin-card";
 import Link from "next/link";
 import { useQuery } from "convex/react";
@@ -161,7 +161,7 @@ export default function VapiView() {
 
                 {/* Plugin Card Section */}
                 <div className="space-y-6">
-               (
+               
                         <PluginCard
                             serviceName="Vapi"
                             serviceImage="/vapi.jpg"
@@ -180,12 +180,17 @@ export default function VapiView() {
                                 icon: WorkflowIcon,
                                 label: "Workflows",
                                 description: "Create custom conversation flows",
-                            }
+                            },
+                            {
+                                icon: LanguagesIcon,
+                                label: "Multilingual Support",
+                                description: "Support for multiple languages"
+                            },
                         ]}
                         onSubmit={handleSubmit}
                         isDisabled={vapiPlugin === undefined}
                     />
-                    )
+                    
                 </div>
             </div>
         </div>
