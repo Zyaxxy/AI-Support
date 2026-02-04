@@ -28,7 +28,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useMutation } from "convex/react";
 import { toast } from "sonner";
-import { open } from "fs";
 
 const formSchema = z.object({
     publicAPIKey: z.string().min(1, "Public API Key is required"),
@@ -58,6 +57,7 @@ const VapiPluginForm =({
             value: {publicAPIKey: values.publicAPIKey, privateAPIKey: values.privateAPIKey},
         });
         setOpen(false);
+        toast.success("Vapi Connected Successfully");
        } catch (error) {
         toast.error("Failed to connect Vapi");
        }
@@ -120,11 +120,7 @@ export default function VapiView() {
     const [connectOpen, setConnectOpen] = useState(false);
     const [removeOpen, setRemoveOpen] = useState(false);
     const handleSubmit = () => {
-        if(vapiPlugin){
-            setRemoveOpen(true);
-        }else{
-            setConnectOpen(true);
-        }
+        setConnectOpen(true);
     };
     return (
         <>
