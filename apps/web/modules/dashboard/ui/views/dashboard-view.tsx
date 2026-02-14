@@ -4,10 +4,7 @@ import { useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
 import {
   Card,
-  CardContent,
-  CardHeader,
 } from "@workspace/ui/components/card";
-import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
@@ -47,7 +44,7 @@ function formatMs(ms: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// KPI Card — Minimal Clean SaaS
+// KPI Card — Compact & Minimal
 // ---------------------------------------------------------------------------
 type TrendStatus = "good" | "bad" | "neutral";
 
@@ -75,34 +72,39 @@ function KpiCard({
 
   const trendColor =
     trendStatus === "good"
-      ? "text-green-600"
+      ? "text-emerald-600"
       : trendStatus === "bad"
         ? "text-red-600"
-        : "text-gray-500";
+        : "text-gray-400";
 
   return (
-    <Card className="border border-gray-200 bg-white rounded-lg shadow-none hover:shadow-sm transition-shadow duration-200">
-      <CardHeader className="flex flex-row items-center justify-between pb-0 pt-3 px-4">
-        <span className="text-sm font-semibold text-gray-500 tracking-wide uppercase">
+    <Card className="flex items-center gap-4 p-4 border border-gray-200 bg-white shadow-none rounded-xl">
+      {/* Icon Section */}
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+        <Icon className="h-5 w-5" />
+      </div>
+
+      {/* Text Section */}
+      <div className="flex flex-col min-w-0">
+        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate">
           {label}
         </span>
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-          <Icon className="h-4.5 w-4.5" />
-        </div>
-      </CardHeader>
-      <CardContent className="px-4 pb-3">
-        {isLoading ? (
-          <Skeleton className="h-10 w-20" />
-        ) : (
-          <div className="text-4xl font-bold text-gray-900 tracking-tight">
-            {value}
+        
+        <div className="flex items-baseline gap-2 mt-0.5">
+          {isLoading ? (
+            <Skeleton className="h-6 w-16" />
+          ) : (
+            <span className="text-xl font-bold text-gray-900 tracking-tight leading-none">
+              {value}
+            </span>
+          )}
+          
+          <div className={cn("flex items-center gap-0.5 text-xs font-medium", trendColor)}>
+            <TrendIcon className="h-3 w-3" />
+            <span className="truncate">{trend}</span>
           </div>
-        )}
-        <div className={cn("mt-1 flex items-center gap-1 text-xs", trendColor)}>
-          <TrendIcon className="h-3 w-3" />
-          <span>{trend}</span>
         </div>
-      </CardContent>
+      </div>
     </Card>
   );
 }
@@ -145,55 +147,57 @@ export const DashboardView = () => {
   };
 
   return (
-    <div className="flex flex-col bg-white h-svh overflow-hidden font-[Inter,sans-serif]">
+    <div className="flex flex-col bg-white h-svh overflow-hidden font-[Inter,sans-serif] text-gray-900">
       {/* ───────────── Header ───────────── */}
-      <header className="border-b border-gray-200 bg-white shrink-0 z-10">
-        <div className="flex items-center justify-between px-6 py-3">
-          <div>
-            <h1 className="text-xl font-bold text-gray-900">
+      <header className="border-b border-gray-200 bg-white shrink-0 z-10 h-16 flex items-center">
+        <div className="flex w-full items-center justify-between px-6">
+          <div className="flex flex-col">
+            <h1 className="text-lg font-bold text-gray-900 leading-tight">
               Live Monitor
             </h1>
-            <p className="text-sm text-gray-500">
-              Manage real-time voice sessions and handle escalations.
+            <p className="text-xs text-gray-500">
+              Real-time oversight
             </p>
           </div>
 
           {/* Global actions */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-4">
+             <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-full border border-green-100">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
+              <span className="text-xs font-medium text-green-700">System Online</span>
+            </div>
+
             <Button
               id="btn-simulate-call"
               size="sm"
-              className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              className="gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg shadow-sm border border-transparent transition-all active:scale-95"
               onClick={handleSimulateCall}
             >
-              <PlayIcon className="h-3.5 w-3.5" />
+              <PlayIcon className="h-3.5 w-3.5 fill-current" />
               Simulate Call
             </Button>
-            <div className="flex items-center gap-1.5 text-sm text-gray-500">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-40" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-              </span>
-              System Operational
-            </div>
           </div>
         </div>
       </header>
 
       {/* ───────────── Content ───────────── */}
-      <div className="flex-1 flex flex-col gap-4 p-4 min-h-0 overflow-hidden">
-        {/* ── KPI Cards ── */}
+      <div className="flex-1 flex flex-col gap-4 p-6 min-h-0 bg-gray-50/50">
+        
+        {/* ── KPI Row (Compact) ── */}
         <section aria-label="Key performance indicators" className="shrink-0">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <KpiCard
-              label="Live Concurrent Calls"
+              label="Active Calls"
               value={kpi?.liveConcurrentCalls ?? 0}
               trend={
                 isLoading
-                  ? "Loading..."
+                  ? "..."
                   : kpi?.liveConcurrentCalls === 0
-                    ? "No active calls"
-                    : "Real-time"
+                    ? "Idle"
+                    : "Live"
               }
               trendStatus="neutral"
               icon={PhoneCallIcon}
@@ -204,10 +208,10 @@ export const DashboardView = () => {
               value={isLoading ? "—" : `${kpi?.interventionRate ?? 0}%`}
               trend={
                 isLoading
-                  ? "Loading..."
+                  ? "..."
                   : (kpi?.interventionRate ?? 0) <= 10
-                    ? "Within target"
-                    : "Above target"
+                    ? "Optimal"
+                    : "High"
               }
               trendStatus={
                 (kpi?.interventionRate ?? 0) <= 10 ? "good" : "bad"
@@ -216,22 +220,18 @@ export const DashboardView = () => {
               isLoading={isLoading}
             />
             <KpiCard
-              label="Avg Resolution Time"
+              label="Avg Resolution"
               value={
                 isLoading
                   ? "—"
                   : kpi?.avgResolutionMs
                     ? formatMs(kpi.avgResolutionMs)
-                    : "No data"
+                    : "0s"
               }
               trend={
-                isLoading
-                  ? "Loading..."
-                  : kpi?.avgResolutionMs
-                    ? "From resolved calls"
-                    : "No resolved calls yet"
+                  kpi?.avgResolutionMs ? "-12s" : "No data"
               }
-              trendStatus="neutral"
+              trendStatus="good"
               icon={ClockIcon}
               isLoading={isLoading}
             />
@@ -239,100 +239,81 @@ export const DashboardView = () => {
         </section>
 
         {/* ── Operational split pane ── */}
-        <section aria-label="Operational view" className="flex-1 min-h-0 overflow-hidden">
-          <Card className="h-full border border-gray-200 rounded-lg shadow-none overflow-hidden bg-white">
-            <ResizablePanelGroup
-              direction="horizontal"
-              className="h-full"
-            >
-              {/* ── Left panel: call list ── */}
-              <ResizablePanel defaultSize={30} minSize={22} maxSize={45}>
-                <div className="flex flex-col h-full">
-                  <div className="px-4 py-3 border-b border-gray-200">
-                    <h2 className="text-sm font-semibold text-gray-900">
-                      Incoming &amp; Active
-                    </h2>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {isLoading
-                        ? "Loading..."
-                        : `${calls.length} active call${calls.length !== 1 ? "s" : ""}`}
-                    </p>
-                  </div>
-                  <ScrollArea className="flex-1">
-                    {isLoading ? (
-                      <div className="space-y-1 p-2">
-                        {[...Array(3)].map((_, i) => (
-                          <div className="p-3 space-y-2" key={i}>
-                            <div className="flex justify-between">
-                              <Skeleton className="h-4 w-28" />
-                              <Skeleton className="h-4 w-12" />
-                            </div>
-                            <Skeleton className="h-5 w-20" />
-                            <Skeleton className="h-2 w-full" />
-                          </div>
-                        ))}
-                      </div>
-                    ) : calls.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-3">
-                          <PhoneOffIcon className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <p className="text-sm font-medium text-gray-900">
-                          No active calls
-                        </p>
-                        <p className="mt-1 text-xs text-gray-500">
-                          Click &quot;Simulate Call&quot; to create one.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-gray-100">
-                        {calls.map((call) => (
-                          <CallListItem
-                            key={call._id}
-                            call={call}
-                            isSelected={call._id === effectiveSelectedId}
-                            onClick={() => setSelectedCallId(call._id)}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </ScrollArea>
+        <section aria-label="Operational view" className="flex-1 min-h-0 overflow-hidden shadow-sm rounded-xl border border-gray-200 bg-white">
+          <ResizablePanelGroup
+            direction="horizontal"
+            className="h-full"
+          >
+            {/* ── Left panel: call list ── */}
+            <ResizablePanel defaultSize={25} minSize={20} maxSize={35} className="bg-white">
+              <div className="flex flex-col h-full">
+                <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between bg-white">
+                  <h2 className="text-sm font-semibold text-gray-900">
+                    Queue
+                  </h2>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600">
+                    {calls.length}
+                  </span>
                 </div>
-              </ResizablePanel>
-
-              <ResizableHandle withHandle />
-
-              {/* ── Right panel: active call ── */}
-              <ResizablePanel defaultSize={70}>
-                {isLoading ? (
-                  <div className="p-6 space-y-4">
-                    <div className="flex justify-between">
-                      <Skeleton className="h-6 w-40" />
-                      <Skeleton className="h-5 w-16" />
+                
+                <ScrollArea className="flex-1">
+                  {isLoading ? (
+                    <div className="space-y-2 p-3">
+                      {[...Array(3)].map((_, i) => (
+                        <Skeleton key={i} className="h-16 w-full rounded-lg" />
+                      ))}
                     </div>
-                    <Skeleton className="h-16 w-full" />
-                    <Skeleton className="h-56 w-full" />
-                    <Skeleton className="h-24 w-full" />
-                  </div>
-                ) : selectedCall ? (
-                  <ActiveCallInterface call={selectedCall} />
-                ) : (
-                  <div className="h-full flex flex-col items-center justify-center text-center px-6">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 mb-4">
-                      <PhoneCallIcon className="h-6 w-6 text-gray-400" />
+                  ) : calls.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center h-full p-6 text-center text-gray-500">
+                      <div className="h-10 w-10 rounded-full bg-gray-50 flex items-center justify-center mb-3">
+                        <PhoneOffIcon className="h-5 w-5 text-gray-400" />
+                      </div>
+                      <p className="text-sm">No active calls</p>
                     </div>
-                    <p className="text-sm font-medium text-gray-900">
-                      No call selected
-                    </p>
-                    <p className="mt-1 text-xs text-gray-500 max-w-xs">
-                      Select a call from the list or click &quot;Simulate
-                      Call&quot; to create one.
-                    </p>
+                  ) : (
+                    <div className="divide-y divide-gray-50">
+                      {calls.map((call) => (
+                        <CallListItem
+                          key={call._id}
+                          call={call}
+                          isSelected={call._id === effectiveSelectedId}
+                          onClick={() => setSelectedCallId(call._id)}
+                        />
+                      ))}
+                    </div>
+                  )}
+                </ScrollArea>
+              </div>
+            </ResizablePanel>
+
+            <ResizableHandle withHandle className="bg-gray-100 border-l border-gray-100" />
+
+            {/* ── Right panel: active call ── */}
+            <ResizablePanel defaultSize={75} className="bg-white">
+              {isLoading ? (
+                <div className="p-8 space-y-6">
+                  <div className="flex justify-between items-center">
+                    <Skeleton className="h-8 w-64" />
+                    <Skeleton className="h-8 w-24" />
                   </div>
-                )}
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </Card>
+                  <Skeleton className="h-32 w-full rounded-xl" />
+                  <Skeleton className="h-64 w-full rounded-xl" />
+                </div>
+              ) : selectedCall ? (
+                <ActiveCallInterface call={selectedCall} />
+              ) : (
+                <div className="h-full flex flex-col items-center justify-center bg-gray-50/30 text-center">
+                  <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-4">
+                     <PhoneCallIcon className="h-8 w-8 text-blue-600" />
+                  </div>
+                  <h3 className="text-gray-900 font-semibold">Ready to Monitor</h3>
+                  <p className="text-sm text-gray-500 mt-1 max-w-xs">
+                    Select a conversation from the queue to view real-time details.
+                  </p>
+                </div>
+              )}
+            </ResizablePanel>
+          </ResizablePanelGroup>
         </section>
       </div>
     </div>

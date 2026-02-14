@@ -2,31 +2,28 @@
 
 import { useEffect, useRef } from "react";
 import { cn } from "@workspace/ui/lib/utils";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-} from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
 import { Button } from "@workspace/ui/components/button";
 import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import { Separator } from "@workspace/ui/components/separator";
+import { DicebearAvatar } from "@workspace/ui/components/dicebear-avatar";
+import Image from "next/image";
 import {
-  UserIcon,
-  BotIcon,
   PhoneOffIcon,
   MessageSquarePlusIcon,
   PhoneForwardedIcon,
-  CalendarIcon,
   CrownIcon,
+  ClockIcon,
+  CornerUpLeftIcon,
 } from "lucide-react";
 import type { Doc } from "@workspace/backend/_generated/dataModel";
 import { useMutation } from "convex/react";
 import { api } from "@workspace/backend/_generated/api";
 
 // ---------------------------------------------------------------------------
-// Duration helper
+// Helpers
 // ---------------------------------------------------------------------------
+
 function formatDuration(startedAt: number): string {
   const elapsed = Math.max(0, Math.floor((Date.now() - startedAt) / 1000));
   const minutes = Math.floor(elapsed / 60);
@@ -35,58 +32,65 @@ function formatDuration(startedAt: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// Waveform visualizer — Minimal smooth lines style
+// Waveform Visualizer
 // ---------------------------------------------------------------------------
 function WaveformVisualizer({
-  lineColor,
+  color,
   label,
+  isActive = true,
 }: {
-  lineColor: string;
+  color: string;
   label: string;
+  isActive?: boolean;
 }) {
-  const barCount = 32;
+  const barCount = 20;
 
   return (
-    <div className="flex flex-col items-center gap-1.5">
-      <span className="text-[10px] font-medium text-gray-400 uppercase tracking-wider">
-        {label}
-      </span>
-      <div className="flex items-end gap-[2px] h-10">
+    <div className="flex flex-col items-center gap-1 w-full max-w-[120px]">
+      <div className="flex items-center justify-center gap-[2px] h-7 w-full">
         {Array.from({ length: barCount }).map((_, i) => (
           <div
             key={i}
-            className="w-[2px] rounded-full origin-bottom"
+            className="w-[2px] rounded-full"
             style={{
-              backgroundColor: lineColor,
-              animation: `audioBar 0.8s ease-in-out ${i * 0.04}s infinite alternate`,
-              height: `${Math.random() * 70 + 30}%`,
-              opacity: 0.5 + Math.random() * 0.5,
+              backgroundColor: color,
+              animation: isActive
+                ? `audioWave 1s ease-in-out ${i * 0.05}s infinite alternate`
+                : "none",
+              height: isActive ? `${Math.max(20, Math.random() * 100)}%` : "3px",
+              opacity: isActive ? 0.6 + Math.random() * 0.4 : 0.2,
             }}
           />
         ))}
       </div>
+      <span className="text-[9px] font-medium text-muted-foreground/60 uppercase tracking-widest">
+        {label}
+      </span>
     </div>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Transcript area — Minimal clean layout
+// Transcript View
 // ---------------------------------------------------------------------------
 function TranscriptView({
   messages,
+  customerSeed,
 }: {
   messages: Doc<"liveCalls">["transcript"];
+  customerSeed: string;
 }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    if (bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
   return (
-    <ScrollArea className="h-56 pr-3" ref={scrollRef}>
+    <ScrollArea className="h-full px-4" ref={scrollRef}>
       <div className="space-y-4 py-4">
         {messages.map((msg, idx) => {
           const isAi = msg.sender === "ai";
@@ -94,210 +98,206 @@ function TranscriptView({
             <div
               key={`${msg.timestamp}-${idx}`}
               className={cn(
-                "flex gap-2.5",
+                "group flex w-full gap-3",
                 isAi ? "justify-start" : "justify-end"
               )}
             >
+              {/* AI Avatar — logo.svg */}
               {isAi && (
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100">
-                  <BotIcon className="h-3.5 w-3.5 text-gray-500" />
+                <div className="relative shrink-0">
+                  <div className="flex size-[44px] items-center justify-center rounded-full bg-background ring-2 ring-background shadow-sm transition-transform duration-200 group-hover:scale-105 overflow-hidden">
+                    <Image src="/logo.svg" alt="AI" width={28} height={28} />
+                  </div>
                 </div>
               )}
-              <div className="max-w-[75%]">
-                <p
-                  className={cn(
-                    "text-sm leading-relaxed",
-                    isAi
-                      ? "text-gray-500"
-                      : "text-gray-900 font-medium"
-                  )}
-                >
+
+              <div className={cn("flex flex-col max-w-[72%]", isAi ? "items-start" : "items-end")}>
+                {/* Header Row */}
+                <div className="flex items-baseline gap-2 mb-1">
+                  <h3 className={cn(
+                    "font-semibold text-sm truncate transition-colors",
+                    isAi ? "text-foreground/90" : "text-foreground"
+                  )}>
+                    {isAi ? "AI Assistant" : "Customer"}
+                  </h3>
+                </div>
+
+                {/* Message bubble */}
+                <div className={cn(
+                  "px-4 py-2.5 rounded-2xl text-xs leading-relaxed transition-colors",
+                  isAi
+                    ? "bg-accent/60 border border-border/40 text-foreground/90 rounded-tl-sm"
+                    : "bg-primary text-primary-foreground rounded-tr-sm"
+                )}>
                   {msg.text}
-                </p>
-                <span className="block mt-1 text-[10px] text-gray-400">
+                </div>
+                <time className="mt-1 text-[11px] text-muted-foreground/80 font-medium px-1">
                   {msg.timestamp}
-                </span>
+                </time>
               </div>
+
+              {/* Customer Avatar — DiceBear */}
               {!isAi && (
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                  <UserIcon className="h-3.5 w-3.5 text-blue-600" />
+                <div className="relative shrink-0">
+                  <DicebearAvatar
+                    seed={customerSeed}
+                    size={44}
+                    className="ring-2 ring-background shadow-sm transition-transform duration-200 group-hover:scale-105"
+                  />
                 </div>
               )}
             </div>
           );
         })}
 
-        {/* Live typing indicator */}
-        <div className="flex gap-2.5 justify-start">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100">
-            <BotIcon className="h-3.5 w-3.5 text-gray-500" />
+        {/* Typing indicator */}
+        <div className="group flex w-full gap-3 justify-start">
+          <div className="relative shrink-0">
+            <div className="flex size-[44px] items-center justify-center rounded-full bg-background ring-2 ring-background shadow-sm overflow-hidden">
+              <Image src="/logo.svg" alt="AI" width={28} height={28} />
+            </div>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-gray-300 animate-bounce [animation-delay:0ms]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-gray-300 animate-bounce [animation-delay:150ms]" />
-            <span className="h-1.5 w-1.5 rounded-full bg-gray-300 animate-bounce [animation-delay:300ms]" />
+          <div className="flex flex-col items-start">
+            <h3 className="font-semibold text-sm text-foreground/90 mb-1">AI Assistant</h3>
+            <div className="flex items-center gap-1 bg-accent/60 border border-border/40 px-4 py-2.5 rounded-2xl rounded-tl-sm">
+              <span className="size-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:0ms]" />
+              <span className="size-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:150ms]" />
+              <span className="size-1.5 rounded-full bg-muted-foreground/40 animate-bounce [animation-delay:300ms]" />
+            </div>
           </div>
         </div>
+
+        <div ref={bottomRef} />
       </div>
     </ScrollArea>
   );
 }
 
 // ---------------------------------------------------------------------------
-// CRM card — Clean minimal
-// ---------------------------------------------------------------------------
-function CrmCard({ call }: { call: Doc<"liveCalls"> }) {
-  return (
-    <Card className="border border-gray-200 bg-white rounded-lg shadow-none">
-      <CardHeader className="pb-2 pt-3 px-4">
-        <span className="text-[11px] font-semibold uppercase tracking-wider text-gray-400">
-          Customer Profile
-        </span>
-      </CardHeader>
-      <CardContent className="px-4 pb-3 space-y-2">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-blue-600 text-white text-sm font-semibold">
-            {call.customer
-              .split(" ")
-              .map((n) => n[0])
-              .join("")}
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-900">
-              {call.customer}
-            </p>
-            {call.plan && (
-              <div className="flex items-center gap-1 mt-0.5">
-                <CrownIcon className="h-3 w-3 text-amber-500" />
-                <span className="text-xs text-gray-500">{call.plan}</span>
-              </div>
-            )}
-          </div>
-        </div>
-        <Separator className="my-1 bg-gray-100" />
-        <div className="grid grid-cols-2 gap-2 text-xs">
-          {call.plan && (
-            <div className="flex items-center gap-1.5 text-gray-500">
-              <CrownIcon className="h-3 w-3" />
-              <span>{call.plan} Plan</span>
-            </div>
-          )}
-          {call.lastInteraction && (
-            <div className="flex items-center gap-1.5 text-gray-500">
-              <CalendarIcon className="h-3 w-3" />
-              <span>{call.lastInteraction}</span>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main component — Minimal Clean SaaS
+// Main Component
 // ---------------------------------------------------------------------------
 export function ActiveCallInterface({ call }: { call: Doc<"liveCalls"> }) {
   const intervene = useMutation(api.private.liveCalls.intervene);
   const endCall = useMutation(api.private.liveCalls.endCall);
 
   return (
-    <div className="flex flex-col h-full bg-white font-[Inter,sans-serif]">
-      {/* Injected CSS for the waveform animation */}
+    <div className="flex flex-col h-full bg-background/50 backdrop-blur-sm">
+      {/* Waveform animation keyframes */}
       <style>{`
-        @keyframes audioBar {
-          0%   { transform: scaleY(0.3); }
-          50%  { transform: scaleY(1);   }
-          100% { transform: scaleY(0.5); }
+        @keyframes audioWave {
+          0%   { transform: scaleY(0.2); }
+          100% { transform: scaleY(1);   }
         }
       `}</style>
 
-      {/* ── Call header ── */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
-        <div>
-          <div className="flex items-center gap-2">
-            <h3 className="text-sm font-semibold text-gray-900">
-              {call.customer}
-            </h3>
+      {/* ── Header — exact same pattern as conversations-panel header ── */}
+      <div className="sticky top-0 z-10 bg-background/80 backdrop-blur-md border-b border-border/50 px-4 py-3 shrink-0">
+        <div className="flex items-center justify-between gap-3">
+          {/* Left: Avatar + Customer identity */}
+          <div className="flex items-center gap-3.5">
+            {/* Avatar with subtle shadow — same as conversations-panel */}
+            <div className="relative shrink-0">
+              <DicebearAvatar
+                seed={call.customer}
+                size={44}
+                className="ring-2 ring-background shadow-sm transition-transform duration-200"
+              />
+              {/* Live indicator — same as unread dot in conversations-panel */}
+              <div className="absolute -top-0.5 -right-0.5 size-3 bg-green-500 rounded-full border-2 border-background shadow-sm" />
+            </div>
+
+            {/* Content — same structure as conversations-panel list item */}
+            <div className="flex-1 min-w-0 space-y-1.5">
+              {/* Header Row */}
+              <div className="flex items-baseline justify-between gap-2">
+                <h3 className="font-semibold text-sm truncate text-foreground">
+                  {call.customer}
+                </h3>
+                {call.plan && (
+                  <Badge
+                    variant="secondary"
+                    className="shrink-0 flex items-center gap-1 h-5 px-1.5 text-[10px] font-medium"
+                  >
+                    <CrownIcon className="size-3" />
+                    {call.plan}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Message Preview Row */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 min-w-0 flex-1">
+                  <CornerUpLeftIcon className="size-3 shrink-0 text-muted-foreground/60" />
+                  <p className="text-xs leading-relaxed text-muted-foreground/80 truncate">
+                    {call.intent ?? "General inquiry"}
+                  </p>
+                </div>
+                <time className="shrink-0 text-[11px] text-muted-foreground/80 font-medium">
+                  <span className="flex items-center gap-1">
+                    <ClockIcon className="size-3" />
+                    {formatDuration(call.startedAt)}
+                  </span>
+                </time>
+              </div>
+            </div>
+          </div>
+
+          {/* Right: Waveform + Live badge */}
+          <div className="hidden md:flex items-center gap-4 shrink-0">
+            <div className="flex items-center gap-3 px-3 py-1.5 bg-background/50 border border-border/50 rounded-xl">
+              <WaveformVisualizer color="hsl(var(--muted-foreground) / 0.4)" label="AI" />
+              <Separator orientation="vertical" className="h-6 bg-border/50" />
+              <WaveformVisualizer color="hsl(var(--primary))" label="Caller" />
+            </div>
+
             <Badge
               variant="secondary"
-              className="bg-gray-100 text-gray-700 rounded-md px-2 py-0.5 text-xs uppercase tracking-wide border-0 font-medium"
+              className="gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold shadow-sm"
             >
-              {call.intent}
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-green-500" />
+              </span>
+              LIVE
             </Badge>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Duration: {formatDuration(call.startedAt)}
-          </p>
-        </div>
-        <div className="flex items-center gap-1.5">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-40" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-          </span>
-          <span className="text-xs font-medium text-green-600">LIVE</span>
         </div>
       </div>
 
-      {/* ── Customer details ── */}
-      <div className="px-6 py-3 border-b border-gray-200 shrink-0">
-        <CrmCard call={call} />
+      {/* ── Transcript — styled as a list identical to conversations-panel ── */}
+      <div className="flex-1 min-h-0">
+        <TranscriptView
+          messages={call.transcript}
+          customerSeed={call.customer}
+        />
       </div>
 
-      {/* ── Waveform visualizer ── */}
-      <div className="px-6 py-4 border-b border-gray-100 bg-white">
-        <div className="flex items-center justify-center gap-10">
-          <WaveformVisualizer lineColor="#E5E7EB" label="AI Channel" />
-          <div className="h-8 w-px bg-gray-200" />
-          <WaveformVisualizer lineColor="#2563EB" label="User Channel" />
-        </div>
-      </div>
-
-      {/* ── Transcript ── */}
-      <div className="flex-1 px-6 py-3 min-h-0 overflow-hidden">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-            Live Transcript
-          </span>
-          <Badge
-            variant="secondary"
-            className="text-[10px] gap-1 bg-gray-100 text-gray-600 border-0"
-          >
-            <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse" />
-            Streaming
-          </Badge>
-        </div>
-        <TranscriptView messages={call.transcript} />
-      </div>
-
-      {/* ── Controls ── */}
-      <div className="border-t border-gray-200 px-6 py-3 bg-white shrink-0">
+      {/* ── Controls footer — same backdrop pattern as header ── */}
+      <div className="sticky bottom-0 z-10 bg-background/80 backdrop-blur-md border-t border-border/50 px-4 py-3 shrink-0">
         <div className="flex items-center gap-2">
           <Button
-            id="btn-take-over"
-            className="flex-1 gap-2 font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
+            size="sm"
+            className="flex-1 gap-2 h-8 text-xs font-semibold bg-destructive hover:bg-destructive/90 text-destructive-foreground shadow-sm transition-all duration-200"
             onClick={() => intervene({ callId: call._id })}
           >
-            <PhoneOffIcon className="h-4 w-4" />
-            Take Over (Intervene)
+            <PhoneOffIcon className="size-3.5" />
+            Take Over
           </Button>
           <Button
-            id="btn-suggest-reply"
             variant="outline"
             size="sm"
-            className="gap-1.5 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="flex-1 gap-2 h-8 text-xs font-medium border-border/50 bg-background/50 hover:bg-accent/50 hover:border-primary/30 shadow-sm transition-all duration-200"
           >
-            <MessageSquarePlusIcon className="h-3.5 w-3.5" />
+            <MessageSquarePlusIcon className="size-3.5" />
             Suggest Reply
           </Button>
           <Button
-            id="btn-transfer"
             variant="outline"
             size="sm"
-            className="gap-1.5 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+            className="flex-1 gap-2 h-8 text-xs font-medium border-border/50 bg-background/50 hover:bg-accent/50 hover:border-primary/30 shadow-sm transition-all duration-200"
             onClick={() => endCall({ callId: call._id })}
           >
-            <PhoneForwardedIcon className="h-3.5 w-3.5" />
+            <PhoneForwardedIcon className="size-3.5" />
             Transfer
           </Button>
         </div>
