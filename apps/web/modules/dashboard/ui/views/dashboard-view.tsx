@@ -2,9 +2,6 @@
 
 import { useState } from "react";
 import { cn } from "@workspace/ui/lib/utils";
-import {
-  Card,
-} from "@workspace/ui/components/card";
 import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import {
@@ -16,11 +13,6 @@ import { ScrollArea } from "@workspace/ui/components/scroll-area";
 import {
   PlayIcon,
   PhoneCallIcon,
-  ShieldAlertIcon,
-  ClockIcon,
-  TrendingDownIcon,
-  TrendingUpIcon,
-  MinusIcon,
   PhoneOffIcon,
 } from "lucide-react";
 import { useQuery, useMutation } from "convex/react";
@@ -44,70 +36,32 @@ function formatMs(ms: number): string {
 }
 
 // ---------------------------------------------------------------------------
-// KPI Card — Compact & Minimal
+// KPI Stat — ultra-compact chip
 // ---------------------------------------------------------------------------
-type TrendStatus = "good" | "bad" | "neutral";
-
-function KpiCard({
+function KpiStat({
   label,
   value,
-  trend,
-  trendStatus,
-  icon: Icon,
+  dotColor,
   isLoading,
 }: {
   label: string;
   value: string | number;
-  trend: string;
-  trendStatus: TrendStatus;
-  icon: React.ElementType;
+  dotColor: string;
   isLoading?: boolean;
 }) {
-  const TrendIcon =
-    trendStatus === "good"
-      ? TrendingDownIcon
-      : trendStatus === "bad"
-        ? TrendingUpIcon
-        : MinusIcon;
-
-  const trendColor =
-    trendStatus === "good"
-      ? "text-emerald-600"
-      : trendStatus === "bad"
-        ? "text-red-600"
-        : "text-gray-400";
-
   return (
-    <Card className="flex items-center gap-4 p-4 border border-gray-200 bg-white shadow-none rounded-xl">
-      {/* Icon Section */}
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
-        <Icon className="h-5 w-5" />
-      </div>
-
-      {/* Text Section */}
-      <div className="flex flex-col min-w-0">
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide truncate">
-          {label}
-        </span>
-        
-        <div className="flex items-baseline gap-2 mt-0.5">
-          {isLoading ? (
-            <Skeleton className="h-6 w-16" />
-          ) : (
-            <span className="text-xl font-bold text-gray-900 tracking-tight leading-none">
-              {value}
-            </span>
-          )}
-          
-          <div className={cn("flex items-center gap-0.5 text-xs font-medium", trendColor)}>
-            <TrendIcon className="h-3 w-3" />
-            <span className="truncate">{trend}</span>
-          </div>
-        </div>
-      </div>
-    </Card>
+    <div className="flex items-center gap-2.5 px-3 py-2 bg-white border border-gray-200/80 rounded-lg shadow-[0_1px_2px_0_rgba(0,0,0,0.03)]">
+      <span className={cn("size-2 rounded-full shrink-0", dotColor)} />
+      <span className="text-[11px] text-gray-500 font-medium whitespace-nowrap">{label}</span>
+      {isLoading ? (
+        <Skeleton className="h-4 w-8" />
+      ) : (
+        <span className="text-sm font-bold text-gray-900 tabular-nums">{value}</span>
+      )}
+    </div>
   );
 }
+
 
 // ---------------------------------------------------------------------------
 // Main view — Minimal Clean SaaS
@@ -124,6 +78,11 @@ export const DashboardView = () => {
   const isLoading = liveData === undefined;
   const calls = liveData?.calls ?? [];
   const kpi = liveData?.kpi;
+
+  // Derive status counts from calls
+  const aiHandlingCount = calls.filter((c) => c.status === "ai_handling").length;
+  const queuedCount = calls.filter((c) => c.status === "queued").length;
+  const escalatedCount = calls.filter((c) => c.status === "handoff_requested").length;
 
   // Auto-select the first call if none selected or selected no longer exists
   const effectiveSelectedId =
@@ -186,53 +145,43 @@ export const DashboardView = () => {
       {/* ───────────── Content ───────────── */}
       <div className="flex-1 flex flex-col gap-4 p-6 min-h-0 bg-gray-50/50">
         
-        {/* ── KPI Row (Compact) ── */}
+        {/* ── KPI Row (Compact chips) ── */}
         <section aria-label="Key performance indicators" className="shrink-0">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <KpiCard
-              label="Active Calls"
+          <div className="flex flex-wrap items-center gap-2">
+            <KpiStat
+              label="Active"
               value={kpi?.liveConcurrentCalls ?? 0}
-              trend={
-                isLoading
-                  ? "..."
-                  : kpi?.liveConcurrentCalls === 0
-                    ? "Idle"
-                    : "Live"
-              }
-              trendStatus="neutral"
-              icon={PhoneCallIcon}
+              dotColor="bg-green-500"
               isLoading={isLoading}
             />
-            <KpiCard
-              label="Intervention Rate"
-              value={isLoading ? "—" : `${kpi?.interventionRate ?? 0}%`}
-              trend={
-                isLoading
-                  ? "..."
-                  : (kpi?.interventionRate ?? 0) <= 10
-                    ? "Optimal"
-                    : "High"
-              }
-              trendStatus={
-                (kpi?.interventionRate ?? 0) <= 10 ? "good" : "bad"
-              }
-              icon={ShieldAlertIcon}
+            <KpiStat
+              label="AI Handling"
+              value={aiHandlingCount}
+              dotColor="bg-blue-500"
               isLoading={isLoading}
             />
-            <KpiCard
+            <KpiStat
+              label="Queued"
+              value={queuedCount}
+              dotColor="bg-amber-500"
+              isLoading={isLoading}
+            />
+            <KpiStat
+              label="Escalated"
+              value={escalatedCount}
+              dotColor="bg-red-500"
+              isLoading={isLoading}
+            />
+            <KpiStat
               label="Avg Resolution"
               value={
                 isLoading
                   ? "—"
                   : kpi?.avgResolutionMs
                     ? formatMs(kpi.avgResolutionMs)
-                    : "0s"
+                    : "—"
               }
-              trend={
-                  kpi?.avgResolutionMs ? "-12s" : "No data"
-              }
-              trendStatus="good"
-              icon={ClockIcon}
+              dotColor="bg-violet-500"
               isLoading={isLoading}
             />
           </div>

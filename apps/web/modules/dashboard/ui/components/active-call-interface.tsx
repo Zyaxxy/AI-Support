@@ -35,11 +35,11 @@ function formatDuration(startedAt: number): string {
 // Waveform Visualizer
 // ---------------------------------------------------------------------------
 function WaveformVisualizer({
-  color,
+  barClassName,
   label,
   isActive = true,
 }: {
-  color: string;
+  barClassName: string;
   label: string;
   isActive?: boolean;
 }) {
@@ -51,9 +51,8 @@ function WaveformVisualizer({
         {Array.from({ length: barCount }).map((_, i) => (
           <div
             key={i}
-            className="w-[2px] rounded-full"
+            className={cn("w-[2px] rounded-full", barClassName)}
             style={{
-              backgroundColor: color,
               animation: isActive
                 ? `audioWave 1s ease-in-out ${i * 0.05}s infinite alternate`
                 : "none",
@@ -112,16 +111,6 @@ function TranscriptView({
               )}
 
               <div className={cn("flex flex-col max-w-[72%]", isAi ? "items-start" : "items-end")}>
-                {/* Header Row */}
-                <div className="flex items-baseline gap-2 mb-1">
-                  <h3 className={cn(
-                    "font-semibold text-sm truncate transition-colors",
-                    isAi ? "text-foreground/90" : "text-foreground"
-                  )}>
-                    {isAi ? "AI Assistant" : "Customer"}
-                  </h3>
-                </div>
-
                 {/* Message bubble */}
                 <div className={cn(
                   "px-4 py-2.5 rounded-2xl text-xs leading-relaxed transition-colors",
@@ -245,9 +234,9 @@ export function ActiveCallInterface({ call }: { call: Doc<"liveCalls"> }) {
           {/* Right: Waveform + Live badge */}
           <div className="hidden md:flex items-center gap-4 shrink-0">
             <div className="flex items-center gap-3 px-3 py-1.5 bg-background/50 border border-border/50 rounded-xl">
-              <WaveformVisualizer color="hsl(var(--muted-foreground) / 0.4)" label="AI" />
+              <WaveformVisualizer barClassName="bg-muted-foreground/40" label="AI" />
               <Separator orientation="vertical" className="h-6 bg-border/50" />
-              <WaveformVisualizer color="hsl(var(--primary))" label="Caller" />
+              <WaveformVisualizer barClassName="bg-primary" label="Caller" />
             </div>
 
             <Badge
