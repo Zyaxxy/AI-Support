@@ -1,444 +1,340 @@
 "use client";
 
-import { useQuery } from "convex/react";
-import { api } from "@workspace/backend/_generated/api";
+import { useState } from "react";
+import { cn } from "@workspace/ui/lib/utils";
 import {
   Card,
   CardContent,
   CardHeader,
-  CardDescription,
 } from "@workspace/ui/components/card";
 import { Badge } from "@workspace/ui/components/badge";
+import { Button } from "@workspace/ui/components/button";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { useOrganization, useUser } from "@clerk/nextjs";
-import Link from "next/link";
 import {
-  InboxIcon,
-  AlertTriangleIcon,
-  CheckCircle2Icon,
-  LibraryBigIcon,
-  ArrowRightIcon,
-  Mic,
-  PaletteIcon,
-  SparklesIcon,
+  ResizablePanelGroup,
+  ResizablePanel,
+  ResizableHandle,
+} from "@workspace/ui/components/resizable";
+import { ScrollArea } from "@workspace/ui/components/scroll-area";
+import {
+  PlayIcon,
+  PhoneCallIcon,
+  ShieldAlertIcon,
+  ClockIcon,
+  TrendingDownIcon,
   TrendingUpIcon,
-  MessageSquareIcon,
-  ZapIcon,
+  MinusIcon,
+  PhoneOffIcon,
 } from "lucide-react";
+import { useQuery, useMutation } from "convex/react";
+import { api } from "@workspace/backend/_generated/api";
+import type { Id } from "@workspace/backend/_generated/dataModel";
+
+import { CallListItem } from "@/modules/dashboard/ui/components/call-list-item";
+import { ActiveCallInterface } from "@/modules/dashboard/ui/components/active-call-interface";
 
 // ---------------------------------------------------------------------------
-// Stat Card
+// Helpers
 // ---------------------------------------------------------------------------
-function StatCard({
-  title,
+
+function formatMs(ms: number): string {
+  if (ms <= 0) return "—";
+  const totalSeconds = Math.floor(ms / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes === 0) return `${seconds}s`;
+  return `${minutes}m ${seconds}s`;
+}
+
+// ---------------------------------------------------------------------------
+// KPI Card — Minimal Clean SaaS
+// ---------------------------------------------------------------------------
+type TrendStatus = "good" | "bad" | "neutral";
+
+function KpiCard({
+  label,
   value,
+  trend,
+  trendStatus,
   icon: Icon,
-  description,
-  href,
-  gradient,
   isLoading,
 }: {
-  title: string;
-  value: number | string;
+  label: string;
+  value: string | number;
+  trend: string;
+  trendStatus: TrendStatus;
   icon: React.ElementType;
-  description: string;
-  href: string;
-  gradient: string;
   isLoading?: boolean;
 }) {
+  const TrendIcon =
+    trendStatus === "good"
+      ? TrendingDownIcon
+      : trendStatus === "bad"
+        ? TrendingUpIcon
+        : MinusIcon;
+
+  const trendColor =
+    trendStatus === "good"
+      ? "text-green-600"
+      : trendStatus === "bad"
+        ? "text-red-600"
+        : "text-gray-500";
+
   return (
-    <Link href={href} id={`stat-card-${title.toLowerCase().replace(/\s+/g, "-")}`}>
-      <Card className="group relative overflow-hidden border-0 shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1 cursor-pointer">
-        {/* gradient accent bar */}
-        <div
-          className={`absolute inset-x-0 top-0 h-1 ${gradient} opacity-80 transition-opacity group-hover:opacity-100`}
-        />
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardDescription className="text-sm font-medium">
-            {title}
-          </CardDescription>
-          <div
-            className={`flex h-9 w-9 items-center justify-center rounded-lg ${gradient} text-white shadow-sm`}
-          >
-            <Icon className="h-4 w-4" />
+    <Card className="border border-gray-200 bg-white rounded-lg shadow-none hover:shadow-sm transition-shadow duration-200">
+      <CardHeader className="flex flex-row items-center justify-between pb-0 pt-3 px-4">
+        <span className="text-sm font-semibold text-gray-500 tracking-wide uppercase">
+          {label}
+        </span>
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+          <Icon className="h-4.5 w-4.5" />
+        </div>
+      </CardHeader>
+      <CardContent className="px-4 pb-3">
+        {isLoading ? (
+          <Skeleton className="h-10 w-20" />
+        ) : (
+          <div className="text-4xl font-bold text-gray-900 tracking-tight">
+            {value}
           </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <Skeleton className="h-8 w-20" />
-          ) : (
-            <div className="text-3xl font-bold tracking-tight">{value}</div>
-          )}
-          <p className="mt-1 text-xs text-muted-foreground">{description}</p>
-        </CardContent>
-      </Card>
-    </Link>
+        )}
+        <div className={cn("mt-1 flex items-center gap-1 text-xs", trendColor)}>
+          <TrendIcon className="h-3 w-3" />
+          <span>{trend}</span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 // ---------------------------------------------------------------------------
-// Quick‑Action Card
-// ---------------------------------------------------------------------------
-function QuickActionCard({
-  title,
-  description,
-  icon: Icon,
-  href,
-  accent,
-}: {
-  title: string;
-  description: string;
-  icon: React.ElementType;
-  href: string;
-  accent: string;
-}) {
-  return (
-    <Link href={href} id={`quick-action-${title.toLowerCase().replace(/\s+/g, "-")}`}>
-      <Card className="group relative overflow-hidden border border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-border hover:shadow-lg hover:-translate-y-0.5 cursor-pointer">
-        <CardContent className="flex items-center gap-4 py-4">
-          <div
-            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${accent} transition-transform duration-300 group-hover:scale-110`}
-          >
-            <Icon className="h-5 w-5" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold leading-none">{title}</p>
-            <p className="mt-1 text-xs text-muted-foreground truncate">
-              {description}
-            </p>
-          </div>
-          <ArrowRightIcon className="h-4 w-4 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1" />
-        </CardContent>
-      </Card>
-    </Link>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Main Dashboard View
+// Main view — Minimal Clean SaaS
 // ---------------------------------------------------------------------------
 export const DashboardView = () => {
-  const { user } = useUser();
-  const { organization } = useOrganization();
+  const [selectedCallId, setSelectedCallId] = useState<Id<"liveCalls"> | null>(
+    null
+  );
 
-  // Fetch conversations for each status to derive counts
-  const unresolvedData = useQuery(api.private.conversation.getMany, {
-    status: "unresolved",
-    paginationOpts: { numItems: 1, cursor: null },
-  });
+  // Real-time queries
+  const liveData = useQuery(api.private.liveCalls.getMany);
+  const simulateCall = useMutation(api.private.liveCalls.simulateCall);
 
-  const escalatedData = useQuery(api.private.conversation.getMany, {
-    status: "escalated",
-    paginationOpts: { numItems: 1, cursor: null },
-  });
+  const isLoading = liveData === undefined;
+  const calls = liveData?.calls ?? [];
+  const kpi = liveData?.kpi;
 
-  const resolvedData = useQuery(api.private.conversation.getMany, {
-    status: "resolved",
-    paginationOpts: { numItems: 1, cursor: null },
-  });
+  // Auto-select the first call if none selected or selected no longer exists
+  const effectiveSelectedId =
+    selectedCallId && calls.some((c) => c._id === selectedCallId)
+      ? selectedCallId
+      : calls.length > 0
+        ? calls[0]!._id
+        : null;
 
-  const allConversationsData = useQuery(api.private.conversation.getMany, {
-    paginationOpts: { numItems: 5, cursor: null },
-  });
+  const selectedCall = effectiveSelectedId
+    ? calls.find((c) => c._id === effectiveSelectedId) ?? null
+    : null;
 
-  const isLoading =
-    unresolvedData === undefined ||
-    escalatedData === undefined ||
-    resolvedData === undefined;
-
-  // Greeting based on time of day
-  const hour = new Date().getHours();
-  const greeting =
-    hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
-  const firstName = user?.firstName ?? "there";
-
-  // Recent conversations for the activity feed
-  const recentConversations = allConversationsData?.page ?? [];
+  const handleSimulateCall = async () => {
+    try {
+      const newId = await simulateCall();
+      setSelectedCallId(newId);
+    } catch (error) {
+      console.error("Failed to simulate call:", error);
+    }
+  };
 
   return (
-    <div className="flex flex-1 flex-col bg-muted/30 min-h-svh">
+    <div className="flex flex-col bg-white h-svh overflow-hidden font-[Inter,sans-serif]">
       {/* ───────────── Header ───────────── */}
-      <header className="border-b bg-background/80 backdrop-blur-md sticky top-0 z-10">
-        <div className="mx-auto max-w-7xl px-6 py-6 sm:px-8">
+      <header className="border-b border-gray-200 bg-white shrink-0 z-10">
+        <div className="flex items-center justify-between px-6 py-3">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">
+              Live Monitor
+            </h1>
+            <p className="text-sm text-gray-500">
+              Manage real-time voice sessions and handle escalations.
+            </p>
+          </div>
+
+          {/* Global actions */}
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 shadow-lg shadow-blue-500/20">
-              <SparklesIcon className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight">
-                {greeting}, {firstName}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {organization?.name
-                  ? `Here's what's happening with ${organization.name} today.`
-                  : "Here's an overview of your support dashboard."}
-              </p>
+            <Button
+              id="btn-simulate-call"
+              size="sm"
+              className="gap-1.5 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
+              onClick={handleSimulateCall}
+            >
+              <PlayIcon className="h-3.5 w-3.5" />
+              Simulate Call
+            </Button>
+            <div className="flex items-center gap-1.5 text-sm text-gray-500">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-40" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+              </span>
+              System Operational
             </div>
           </div>
         </div>
       </header>
 
       {/* ───────────── Content ───────────── */}
-      <div className="mx-auto w-full max-w-7xl flex-1 space-y-8 px-6 py-8 sm:px-8">
-        {/* ── Stat Cards ── */}
-        <section aria-label="Overview statistics">
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <StatCard
-              title="Total Conversations"
+      <div className="flex-1 flex flex-col gap-4 p-4 min-h-0 overflow-hidden">
+        {/* ── KPI Cards ── */}
+        <section aria-label="Key performance indicators" className="shrink-0">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <KpiCard
+              label="Live Concurrent Calls"
+              value={kpi?.liveConcurrentCalls ?? 0}
+              trend={
+                isLoading
+                  ? "Loading..."
+                  : kpi?.liveConcurrentCalls === 0
+                    ? "No active calls"
+                    : "Real-time"
+              }
+              trendStatus="neutral"
+              icon={PhoneCallIcon}
+              isLoading={isLoading}
+            />
+            <KpiCard
+              label="Intervention Rate"
+              value={isLoading ? "—" : `${kpi?.interventionRate ?? 0}%`}
+              trend={
+                isLoading
+                  ? "Loading..."
+                  : (kpi?.interventionRate ?? 0) <= 10
+                    ? "Within target"
+                    : "Above target"
+              }
+              trendStatus={
+                (kpi?.interventionRate ?? 0) <= 10 ? "good" : "bad"
+              }
+              icon={ShieldAlertIcon}
+              isLoading={isLoading}
+            />
+            <KpiCard
+              label="Avg Resolution Time"
               value={
                 isLoading
                   ? "—"
-                  : (unresolvedData?.page.length ?? 0) +
-                    (escalatedData?.page.length ?? 0) +
-                    (resolvedData?.page.length ?? 0)
+                  : kpi?.avgResolutionMs
+                    ? formatMs(kpi.avgResolutionMs)
+                    : "No data"
               }
-              icon={MessageSquareIcon}
-              description="All conversations"
-              href="/conversations"
-              gradient="bg-gradient-to-br from-blue-500 to-blue-600"
-              isLoading={isLoading}
-            />
-            <StatCard
-              title="Unresolved"
-              value={isLoading ? "—" : (unresolvedData?.page.length ?? 0)}
-              icon={InboxIcon}
-              description="Awaiting response"
-              href="/conversations"
-              gradient="bg-gradient-to-br from-amber-500 to-orange-500"
-              isLoading={isLoading}
-            />
-            <StatCard
-              title="Escalated"
-              value={isLoading ? "—" : (escalatedData?.page.length ?? 0)}
-              icon={AlertTriangleIcon}
-              description="Needs attention"
-              href="/conversations"
-              gradient="bg-gradient-to-br from-rose-500 to-red-500"
-              isLoading={isLoading}
-            />
-            <StatCard
-              title="Resolved"
-              value={isLoading ? "—" : (resolvedData?.page.length ?? 0)}
-              icon={CheckCircle2Icon}
-              description="Successfully closed"
-              href="/conversations"
-              gradient="bg-gradient-to-br from-emerald-500 to-green-500"
+              trend={
+                isLoading
+                  ? "Loading..."
+                  : kpi?.avgResolutionMs
+                    ? "From resolved calls"
+                    : "No resolved calls yet"
+              }
+              trendStatus="neutral"
+              icon={ClockIcon}
               isLoading={isLoading}
             />
           </div>
         </section>
 
-        <div className="grid gap-8 lg:grid-cols-5">
-          {/* ── Quick Actions ── */}
-          <section className="lg:col-span-2 space-y-4" aria-label="Quick actions">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Quick Actions
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Jump to the most common tasks
-              </p>
-            </div>
-            <div className="grid gap-3">
-              <QuickActionCard
-                title="View Conversations"
-                description="Manage and respond to customer inquiries"
-                icon={InboxIcon}
-                href="/conversations"
-                accent="bg-blue-100 text-blue-600 dark:bg-blue-950 dark:text-blue-400"
-              />
-              <QuickActionCard
-                title="Knowledge Base"
-                description="Upload and manage support documents"
-                icon={LibraryBigIcon}
-                href="/files"
-                accent="bg-violet-100 text-violet-600 dark:bg-violet-950 dark:text-violet-400"
-              />
-              <QuickActionCard
-                title="Voice Assistant"
-                description="Configure your Vapi voice assistant"
-                icon={Mic}
-                href="/plugins/vapi"
-                accent="bg-emerald-100 text-emerald-600 dark:bg-emerald-950 dark:text-emerald-400"
-              />
-              <QuickActionCard
-                title="Widget Customization"
-                description="Personalize the look & feel of your widget"
-                icon={PaletteIcon}
-                href="/customization"
-                accent="bg-amber-100 text-amber-600 dark:bg-amber-950 dark:text-amber-400"
-              />
-            </div>
-          </section>
-
-          {/* ── Recent Activity ── */}
-          <section className="lg:col-span-3 space-y-4" aria-label="Recent activity">
-            <div>
-              <h2 className="text-lg font-semibold tracking-tight">
-                Recent Activity
-              </h2>
-              <p className="text-sm text-muted-foreground">
-                Latest conversations across your organization
-              </p>
-            </div>
-            <Card className="border-border/50 shadow-sm">
-              <CardContent className="p-0">
-                {allConversationsData === undefined ? (
-                  <div className="space-y-4 p-6">
-                    {[...Array(4)].map((_, i) => (
-                      <div key={i} className="flex items-center gap-4">
-                        <Skeleton className="h-10 w-10 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-3/4" />
-                          <Skeleton className="h-3 w-1/2" />
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : recentConversations.length === 0 ? (
-                  <div className="flex flex-col items-center justify-center py-16 text-center">
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted mb-4">
-                      <ZapIcon className="h-6 w-6 text-muted-foreground" />
-                    </div>
-                    <p className="text-sm font-medium">No conversations yet</p>
-                    <p className="mt-1 text-xs text-muted-foreground max-w-xs">
-                      Conversations will appear here once customers start
-                      reaching out through your support widget.
+        {/* ── Operational split pane ── */}
+        <section aria-label="Operational view" className="flex-1 min-h-0 overflow-hidden">
+          <Card className="h-full border border-gray-200 rounded-lg shadow-none overflow-hidden bg-white">
+            <ResizablePanelGroup
+              direction="horizontal"
+              className="h-full"
+            >
+              {/* ── Left panel: call list ── */}
+              <ResizablePanel defaultSize={30} minSize={22} maxSize={45}>
+                <div className="flex flex-col h-full">
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <h2 className="text-sm font-semibold text-gray-900">
+                      Incoming &amp; Active
+                    </h2>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {isLoading
+                        ? "Loading..."
+                        : `${calls.length} active call${calls.length !== 1 ? "s" : ""}`}
                     </p>
                   </div>
-                ) : (
-                  <ul className="divide-y">
-                    {recentConversations.map((conversation) => {
-                      const statusConfig: Record<
-                        string,
-                        {
-                          label: string;
-                          variant: "default" | "secondary" | "destructive" | "outline";
-                          dotColor: string;
-                        }
-                      > = {
-                        unresolved: {
-                          label: "Unresolved",
-                          variant: "outline",
-                          dotColor: "bg-amber-500",
-                        },
-                        escalated: {
-                          label: "Escalated",
-                          variant: "destructive",
-                          dotColor: "bg-red-500",
-                        },
-                        resolved: {
-                          label: "Resolved",
-                          variant: "secondary",
-                          dotColor: "bg-emerald-500",
-                        },
-                      };
-                      const cfg = statusConfig[conversation.status] ?? {
-                        label: "Unresolved",
-                        variant: "outline" as const,
-                        dotColor: "bg-amber-500",
-                      };
-
-                      return (
-                        <li key={conversation._id}>
-                          <Link
-                            href={`/conversations/${conversation._id}`}
-                            className="flex items-center gap-4 px-6 py-4 transition-colors hover:bg-muted/50"
-                          >
-                            {/* Status dot */}
-                            <span className="relative flex h-2.5 w-2.5 shrink-0">
-                              <span
-                                className={`absolute inline-flex h-full w-full animate-ping rounded-full ${cfg.dotColor} opacity-40`}
-                              />
-                              <span
-                                className={`relative inline-flex h-2.5 w-2.5 rounded-full ${cfg.dotColor}`}
-                              />
-                            </span>
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2">
-                                <p className="text-sm font-medium truncate">
-                                  {conversation.contactSession?.name ?? "Unknown Contact"}
-                                </p>
-                                <Badge variant={cfg.variant} className="text-[10px] px-1.5 py-0">
-                                  {cfg.label}
-                                </Badge>
-                              </div>
-                              <p className="mt-0.5 text-xs text-muted-foreground truncate">
-                                {conversation.lastMessage?.text || "No messages yet"}
-                              </p>
+                  <ScrollArea className="flex-1">
+                    {isLoading ? (
+                      <div className="space-y-1 p-2">
+                        {[...Array(3)].map((_, i) => (
+                          <div className="p-3 space-y-2" key={i}>
+                            <div className="flex justify-between">
+                              <Skeleton className="h-4 w-28" />
+                              <Skeleton className="h-4 w-12" />
                             </div>
-                            {/* Timestamp */}
-                            <span className="text-xs text-muted-foreground whitespace-nowrap">
-                              {formatRelativeTime(conversation._creationTime)}
-                            </span>
-                          </Link>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </CardContent>
-            </Card>
-            {recentConversations.length > 0 && (
-              <div className="flex justify-end">
-                <Link
-                  href="/conversations"
-                  className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline"
-                >
-                  View all conversations
-                  <ArrowRightIcon className="h-3.5 w-3.5" />
-                </Link>
-              </div>
-            )}
-          </section>
-        </div>
+                            <Skeleton className="h-5 w-20" />
+                            <Skeleton className="h-2 w-full" />
+                          </div>
+                        ))}
+                      </div>
+                    ) : calls.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 mb-3">
+                          <PhoneOffIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <p className="text-sm font-medium text-gray-900">
+                          No active calls
+                        </p>
+                        <p className="mt-1 text-xs text-gray-500">
+                          Click &quot;Simulate Call&quot; to create one.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-gray-100">
+                        {calls.map((call) => (
+                          <CallListItem
+                            key={call._id}
+                            call={call}
+                            isSelected={call._id === effectiveSelectedId}
+                            onClick={() => setSelectedCallId(call._id)}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </ScrollArea>
+                </div>
+              </ResizablePanel>
 
-        {/* ── Helpful tips strip ── */}
-        <section aria-label="Tips and updates">
-          <Card className="border-border/40 bg-gradient-to-r from-blue-50/50 via-indigo-50/30 to-violet-50/50 dark:from-blue-950/20 dark:via-indigo-950/10 dark:to-violet-950/20 shadow-none">
-            <CardContent className="flex flex-col sm:flex-row items-start sm:items-center gap-4 py-5">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 text-white shadow-sm">
-                <TrendingUpIcon className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold">
-                  Tip: Boost your AI accuracy
-                </p>
-                <p className="mt-0.5 text-xs text-muted-foreground">
-                  Upload more documents to your Knowledge Base so the AI agent
-                  can provide more accurate answers to your customers.
-                </p>
-              </div>
-              <Link
-                href="/files"
-                className="inline-flex items-center gap-1 rounded-md bg-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-sm transition-colors hover:bg-primary/90"
-              >
-                Upload files
-                <ArrowRightIcon className="h-3 w-3" />
-              </Link>
-            </CardContent>
+              <ResizableHandle withHandle />
+
+              {/* ── Right panel: active call ── */}
+              <ResizablePanel defaultSize={70}>
+                {isLoading ? (
+                  <div className="p-6 space-y-4">
+                    <div className="flex justify-between">
+                      <Skeleton className="h-6 w-40" />
+                      <Skeleton className="h-5 w-16" />
+                    </div>
+                    <Skeleton className="h-16 w-full" />
+                    <Skeleton className="h-56 w-full" />
+                    <Skeleton className="h-24 w-full" />
+                  </div>
+                ) : selectedCall ? (
+                  <ActiveCallInterface call={selectedCall} />
+                ) : (
+                  <div className="h-full flex flex-col items-center justify-center text-center px-6">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 mb-4">
+                      <PhoneCallIcon className="h-6 w-6 text-gray-400" />
+                    </div>
+                    <p className="text-sm font-medium text-gray-900">
+                      No call selected
+                    </p>
+                    <p className="mt-1 text-xs text-gray-500 max-w-xs">
+                      Select a call from the list or click &quot;Simulate
+                      Call&quot; to create one.
+                    </p>
+                  </div>
+                )}
+              </ResizablePanel>
+            </ResizablePanelGroup>
           </Card>
         </section>
       </div>
     </div>
   );
 };
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-function formatRelativeTime(timestamp: number): string {
-  const now = Date.now();
-  const diff = now - timestamp;
-
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(seconds / 60);
-  const hours = Math.floor(minutes / 60);
-  const days = Math.floor(hours / 24);
-
-  if (days > 0) return `${days}d ago`;
-  if (hours > 0) return `${hours}h ago`;
-  if (minutes > 0) return `${minutes}m ago`;
-  return "Just now";
-}

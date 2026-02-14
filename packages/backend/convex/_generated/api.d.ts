@@ -13,6 +13,7 @@ import type * as lib_secrets from "../lib/secrets.js";
 import type * as playground from "../playground.js";
 import type * as private_conversation from "../private/conversation.js";
 import type * as private_files from "../private/files.js";
+import type * as private_liveCalls from "../private/liveCalls.js";
 import type * as private_messages from "../private/messages.js";
 import type * as private_plugins from "../private/plugins.js";
 import type * as private_secrets from "../private/secrets.js";
@@ -53,6 +54,7 @@ declare const fullApi: ApiFromModules<{
   playground: typeof playground;
   "private/conversation": typeof private_conversation;
   "private/files": typeof private_files;
+  "private/liveCalls": typeof private_liveCalls;
   "private/messages": typeof private_messages;
   "private/plugins": typeof private_plugins;
   "private/secrets": typeof private_secrets;

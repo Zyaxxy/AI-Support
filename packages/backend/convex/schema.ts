@@ -48,4 +48,36 @@ export default defineSchema({
     users: defineTable({
         name: v.string(),
     }),
+    liveCalls: defineTable({
+        organizationId: v.string(),
+        customer: v.string(),
+        intent: v.string(),
+        status: v.union(
+            v.literal("ai_handling"),
+            v.literal("handoff_requested"),
+            v.literal("queued"),
+            v.literal("ended")
+        ),
+        sentimentScore: v.optional(v.number()),
+        alertLevel: v.optional(
+            v.union(
+                v.literal("normal"),
+                v.literal("warning"),
+                v.literal("critical")
+            )
+        ),
+        startedAt: v.number(),
+        endedAt: v.optional(v.number()),
+        plan: v.optional(v.string()),
+        lastInteraction: v.optional(v.string()),
+        transcript: v.array(
+            v.object({
+                sender: v.union(v.literal("ai"), v.literal("user")),
+                text: v.string(),
+                timestamp: v.string(),
+            })
+        ),
+    })
+        .index("by_organizationId_and_status", ["organizationId", "status"])
+        .index("by_organizationId", ["organizationId"]),
 })  
