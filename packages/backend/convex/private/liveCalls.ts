@@ -98,12 +98,22 @@ export const getMany = query({
             avgResolutionMs = totalMs / endedCalls.length;
         }
 
+        // Active chat conversations (unresolved)
+        const unresolvedChats = await ctx.db
+            .query("conversations")
+            .withIndex("by_status_and_organization_id", (q) =>
+                q.eq("status", "unresolved").eq("organizationId", orgId)
+            )
+            .collect();
+        const liveConcurrentChats = unresolvedChats.length;
+
         return {
             calls: activeCalls,
             kpi: {
                 liveConcurrentCalls,
                 interventionRate,
                 avgResolutionMs,
+                liveConcurrentChats,
             },
         };
     },

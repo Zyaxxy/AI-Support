@@ -149,7 +149,7 @@ export const DashboardView = () => {
         <section aria-label="Key performance indicators" className="shrink-0">
           <div className="flex flex-wrap items-center gap-2">
             <KpiStat
-              label="Active"
+              label="Active Calls"
               value={kpi?.liveConcurrentCalls ?? 0}
               dotColor="bg-green-500"
               isLoading={isLoading}
@@ -182,6 +182,18 @@ export const DashboardView = () => {
                     : "—"
               }
               dotColor="bg-violet-500"
+              isLoading={isLoading}
+            />
+            <KpiStat
+              label="Intervention Rate"
+              value={isLoading ? "—" : `${kpi?.interventionRate ?? 0}%`}
+              dotColor="bg-violet-500"
+              isLoading={isLoading}
+            />
+            <KpiStat
+              label="Active Chats"
+              value={kpi?.liveConcurrentChats ?? 0}
+              dotColor="bg-green-500"
               isLoading={isLoading}
             />
           </div>
