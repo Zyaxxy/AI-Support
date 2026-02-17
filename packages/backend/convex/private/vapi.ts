@@ -6,7 +6,7 @@ import { ConvexError } from "convex/values";
 
 export const getAssistants = action({
     args: {},
-    handler: async (ctx, args) => {
+    handler: async (ctx) : Promise<Vapi.Assistant[]> => {
         const identity = await ctx.auth.getUserIdentity();
         if (identity === null) {
             throw new ConvexError({
@@ -63,7 +63,7 @@ export const getAssistants = action({
 
 export const getPhoneNumber = action({
     args: {},
-    handler: async (ctx, args) => {
+    handler: async (ctx):  Promise<Vapi.ListPhoneNumbersResponseItem[]> => {
         const identity = await ctx.auth.getUserIdentity();
         if (identity === null) {
             throw new ConvexError({
