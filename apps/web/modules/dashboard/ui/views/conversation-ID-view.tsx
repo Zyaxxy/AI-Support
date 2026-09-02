@@ -173,10 +173,13 @@ export const ConversationIdView = ({ conversationId }: { conversationId: Id<"con
                         />
                         <AIInputToolbar>
                             <AIInputTools>
-                                <AIInputButton disabled={conversation?.status === "resolved"
-                                    || form.formState.isSubmitting ||
-                                    isEnhancing || !form.formState.isValid}>
-                                    <Wand2Icon />
+                                <AIInputButton
+                                    onClick={handleEnhanceResponse}
+                                    type="button"
+                                    disabled={conversation?.status === "resolved"
+                                        || form.formState.isSubmitting ||
+                                        isEnhancing || !form.getValues("message")?.trim()}>
+                                    <Wand2Icon className="size-3.5" />
                                     {isEnhancing ? "Enhancing..." : "Enhance"}
                                 </AIInputButton>
                             </AIInputTools>

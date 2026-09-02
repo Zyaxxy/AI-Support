@@ -80,4 +80,29 @@ export default defineSchema({
     })
         .index("by_organizationId_and_status", ["organizationId", "status"])
         .index("by_organizationId", ["organizationId"]),
+    customization: defineTable({
+        organizationId: v.string(),
+        primaryColor: v.string(),
+        widgetTitle: v.string(),
+        greetingHeading: v.string(),
+        greetingSubheading: v.string(),
+        botName: v.string(),
+        botAvatar: v.optional(v.string()),
+        position: v.union(v.literal("bottom-right"), v.literal("bottom-left")),
+        enableVoice: v.boolean(),
+        enableHumanHandoff: v.boolean(),
+        offlineEmail: v.optional(v.string()),
+        theme: v.optional(v.union(v.literal("light"), v.literal("dark"), v.literal("system"))),
+    })
+        .index("by_organizationId", ["organizationId"]),
+    offlineTickets: defineTable({
+        organizationId: v.string(),
+        name: v.string(),
+        email: v.string(),
+        subject: v.string(),
+        message: v.string(),
+        status: v.union(v.literal("open"), v.literal("in_progress"), v.literal("closed")),
+        createdAt: v.number(),
+    })
+        .index("by_organizationId", ["organizationId"]),
 })  
